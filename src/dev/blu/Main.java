@@ -1,38 +1,21 @@
 package dev.blu;
 
-import jdk.internal.util.xml.impl.Input;
-
 import java.io.*;
 
 public class Main {
 
-    public static void main(String[] args)  {
-        String fileDir = args[0];
-        int parts = Integer.parseInt(args[1]);
-
-        File inputFile = new File(fileDir);
-        int part_length = (int) (inputFile.length()/parts)+1;
-
-        FileInputStream fis = null;
-        try {
-            fis = new FileInputStream(inputFile);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+    public static void main(String[] args) {
+        if (args.length==0) {
+            System.out.println("no args, exiting...");
+            return;
         }
-
-        int i = 0;
-        byte[] buffer = new byte[part_length];
+        String fileDir = args[0];
+        File inputFile = new File(fileDir);
+        int parts = Integer.parseInt(args[1]);
         try {
-            while (fis.read(buffer)!=-1){
-                File outputFile = new File(inputFile.getAbsolutePath()+inputFile.getName()+"_"+ i +".part");
-                i++;
-                outputFile.createNewFile();
-                FileOutputStream fos = new FileOutputStream(outputFile);
-                fos.write(buffer);
-            }
+            FilePartitioner.divide(inputFile,parts);
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 }
