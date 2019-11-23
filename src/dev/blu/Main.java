@@ -5,15 +5,27 @@ import java.io.*;
 public class Main {
 
     public static void main(String[] args) {
+        String fileDir = "";
+        int parts = 0;
+
         if (args.length==0) {
-            System.out.println("no args, exiting...");
-            return;
+            System.out.println("no args, using default hardcoded...");
+
+            /*
+            parts = 5;
+            fileDir ="D:\\FilePart\\text.txt";
+            */
+
+            parts = 12;
+            fileDir = "D:\\FilePart\\trial.jpg";
         }
-        String fileDir = args[0];
-        File inputFile = new File(fileDir);
-        int parts = Integer.parseInt(args[1]);
+        else {
+            fileDir = args[0];
+            parts = Integer.parseInt(args[1]);
+        }
         try {
-            FilePartitioner.divide(inputFile,parts);
+            FilePartitioner.split(fileDir,parts);
+            FilePartitioner.merge(fileDir);
         } catch (IOException e) {
             e.printStackTrace();
         }
