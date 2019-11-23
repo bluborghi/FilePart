@@ -34,23 +34,6 @@ public class FilePartitioner {
         return 0;
     }
 
-    /*public static int getNumberOfParts(String dir) {
-        File f = new File(dir);
-        String name = f.getName();
-        String ext = getFileExtension(name);
-        String prefix = removeFileExtension(name);
-
-        int i=0;
-        boolean exists;
-        do {
-            i++;
-            exists = new File(prefix + "." + String.format("%0" + ext.length() + "d", i)).exists();
-        } while (exists);
-        int numberOfParts = i-1;
-
-        return numberOfParts;
-    }*/
-
     public static int merge(String dir) throws IOException {
         File f = new File(dir);
         return merge(f);
@@ -71,9 +54,9 @@ public class FilePartitioner {
 
         String full = starter.getAbsolutePath();                        //C:\files\photo.png.001
         String name = starter.getName();                                //photo.png.001
-        String ext = getFileExtension(name);                            //001
-        String prefix = removeFileExtension(name);                      //photo.png
-        String parent = getParentDirectory(full)+"\\";                  //C:\files\
+        String ext = FileHelper.getFileExtension(name);                            //001
+        String prefix = FileHelper.removeFileExtension(name);                      //photo.png
+        String parent = FileHelper.getParentDirectory(full)+"\\";                  //C:\files\
 
         File output = new File(parent +"_"+ prefix);          //C:\files\_photo.png
         output.createNewFile();
@@ -91,27 +74,22 @@ public class FilePartitioner {
         return 0;
     }
 
-    private static String getParentDirectory(String dir) {
-        return new File(dir).getAbsoluteFile().getParent();
-    }
+    /*public static int getNumberOfParts(String dir) {
+        File f = new File(dir);
+        String name = f.getName();
+        String ext = getFileExtension(name);
+        String prefix = removeFileExtension(name);
 
-    private static String getFileExtension(String fileName) { //boh se no c'è string tokenizer
-        if (hasExtension(fileName))
-            return fileName.substring(fileName.lastIndexOf(".") + 1);
-        else
-            return "";
-    }
+        int i=0;
+        boolean exists;
+        do {
+            i++;
+            exists = new File(prefix + "." + String.format("%0" + ext.length() + "d", i)).exists();
+        } while (exists);
+        int numberOfParts = i-1;
 
-    private static String removeFileExtension(String fileName) {
-        if (hasExtension(fileName))
-            return fileName.substring(0, fileName.lastIndexOf("."));
-        else
-            return fileName;
-    }
-
-    private static boolean hasExtension(String fileName) {
-        return fileName.lastIndexOf(".") != -1 && fileName.lastIndexOf(".") != 0;
-    }
+        return numberOfParts;
+    }*/
 }
 
 

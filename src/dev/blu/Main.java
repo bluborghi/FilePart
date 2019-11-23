@@ -10,12 +10,10 @@ public class Main {
 
         if (args.length==0) {
             System.out.println("no args, using default hardcoded...");
-
             /*
             parts = 5;
             fileDir ="D:\\FilePart\\text.txt";
             */
-
             parts = 12;
             fileDir = "D:\\FilePart\\trial.jpg";
         }
