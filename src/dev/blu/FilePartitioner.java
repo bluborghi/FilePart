@@ -13,6 +13,8 @@ public class FilePartitioner {
 
         int part_length = (int) (f.length() / parts) + 1;
         FileInputStream fis = new FileInputStream(f);
+        int extension_length = String.valueOf(parts-1).length();
+        if (extension_length < 3) extension_length = 3;
 
         int i = 1;
         byte[] buffer = new byte[part_length];
@@ -20,8 +22,8 @@ public class FilePartitioner {
             if (i<parts)
                 fis.read(buffer);
             else
-                buffer = fis.readAllBytes(); //the last partition is smaller than part_length
-            File outputFile = new File(f.getAbsolutePath() + "." + String.format("%0" + String.valueOf(parts-1).length() + "d", i));
+                buffer = fis.readAllBytes(); //the last partition can be smaller than part_length
+            File outputFile = new File(f.getAbsolutePath() + "." + String.format("%0" + extension_length  + "d", i));
             i++;
             outputFile.createNewFile();
             FileOutputStream fos = new FileOutputStream(outputFile);
