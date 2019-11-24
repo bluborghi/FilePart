@@ -19,7 +19,7 @@ public class Main {
             parts = 8;
             fileDir = "D:\\FilePart\\trial.jpg";
             */
-            parts = 10;
+            parts = 3;
             fileDir = "D:\\FilePart\\Debian.vhd";
 
         }
