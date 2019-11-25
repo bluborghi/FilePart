@@ -4,44 +4,19 @@ import java.io.*;
 
 public class FilePartitioner {
 
-    public static int splitByNumberOfParts(String dir, int parts) throws IOException {
+    public static int splitByNumberOfParts(String dir, long parts) throws IOException {
         File f = new File(dir);
         return splitByNumberOfParts(f, parts);
     }
 
-    public static int splitByNumberOfParts(File f, int parts) throws IOException {
+    public static int splitByNumberOfParts(File f, long parts) throws IOException {
         long file_length = f.length();
         long part_length = (file_length+parts-1)/parts;//formula to round up an integer division (positive only members)
         return splitByMaxFileDimension(f,part_length);
-
-        /*long file_length = f.length();
-        int part_length = (int) ((file_length) / parts) + 1;
-        int last_part_length = (int) (file_length - part_length * (parts - 1));
-        FileInputStream fis = new FileInputStream(f);
-        int extension_length = String.valueOf(parts - 1).length();
-        if (extension_length < 3) extension_length = 3;
-
-
-        int i = 1;
-
-        while (i <= parts) {
-            File outputFile = new File(f.getAbsolutePath() + "." + String.format("%0" + extension_length + "d", i));
-            FileOutputStream fos = new FileOutputStream(outputFile);
-
-            if (i < parts)
-                transfer(fis, fos, part_length);
-            else
-                transfer(fis, fos, last_part_length);
-
-            fos.close();
-            i++;
-        }
-        fis.close();
-        return 0;*/
     }
 
     private static void transfer(FileInputStream fis, FileOutputStream fos, long part_length) throws IOException {
-        int MAX_BUF_LENGTH = 1024 * 1024 * 128; //128MB
+        int MAX_BUF_LENGTH = 1024 * 1024 * 64; //64MiB
         int buffer_length;
         int last_buffer_length;
         byte[] buffer;
@@ -91,30 +66,6 @@ public class FilePartitioner {
         }
         fis.close();
         return 0;
-
-        /* int parts = (int) (f.length() / maxSize) + 1;
-
-
-        FileInputStream fis = new FileInputStream(f);
-        int extension_length = String.valueOf(parts - 1).length();
-        if (extension_length < 3) extension_length = 3;
-
-        int i = 1;
-        byte[] buffer = new byte[part_length];
-        while (i <= parts) {
-            if (i < parts)
-                fis.read(buffer);
-            else
-                buffer = fis.readAllBytes(); //the last partition can be smaller than part_length
-            File outputFile = new File(f.getAbsolutePath() + "." + String.format("%0" + extension_length + "d", i));
-            i++;
-            outputFile.createNewFile();
-            FileOutputStream fos = new FileOutputStream(outputFile);
-            fos.write(buffer);
-            fos.close();
-        }
-        fis.close();
-        return 0;*/
     }
 
     public static int merge(String dir) throws IOException {
@@ -158,28 +109,6 @@ public class FilePartitioner {
         return 0;
     }
 
-
-
-
-
-
-
-    /*public static int getNumberOfParts(String dir) {
-        File f = new File(dir);
-        String name = f.getName();
-        String ext = getFileExtension(name);
-        String prefix = removeFileExtension(name);
-
-        int i=0;
-        boolean exists;
-        do {
-            i++;
-            exists = new File(prefix + "." + String.format("%0" + ext.length() + "d", i)).exists();
-        } while (exists);
-        int numberOfParts = i-1;
-
-        return numberOfParts;
-    }*/
 }
 
 

@@ -7,39 +7,31 @@ import static java.time.temporal.ChronoUnit.SECONDS;
 
 public class Main {
 
-    public static void main(String[] args) {
-        String fileDir;
-        int parts;
-
-        if (args.length==0) {
-            System.out.println("no args, using default hardcoded...");
-            /*
-            parts = 5;
-            fileDir ="D:\\FilePart\\text.txt";
-            parts = 8;
-            fileDir = "D:\\FilePart\\trial.jpg";
-            */
-            parts = 3;
-            fileDir = "D:\\FilePart\\Debian.vhd";
-
-        }
-        else {
-            fileDir = args[0];
-            parts = Integer.parseInt(args[1]);
-        }
-        try {
-            LocalTime t0 = LocalTime.now();
-            FilePartitioner.splitByNumberOfParts(fileDir,parts);
-            LocalTime t1 = LocalTime.now();
-            System.out.println("Split time: "+ SECONDS.between(t0,t1));
-            FilePartitioner.merge(fileDir);
-            LocalTime t2 = LocalTime.now();
-
-            System.out.println("Merge time: "+ SECONDS.between(t1,t2));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public static void main(String[] args) throws InterruptedException {
+        String fileDir1, fileDir2, fileDir3;
+        int parts1, parts2, parts3;
 
 
+        System.out.println("no args, using default hardcoded...");
+
+        parts1 = 4;
+        fileDir1 = "D:\\FilePart\\Debian.iso";
+        parts2 = 5;
+        fileDir2 = "D:\\FilePart\\UserBenchMark.exe";
+        parts3 = 8;
+        fileDir3 = "D:\\FilePart\\trial.jpg";
+
+
+        Thread fpt1 = new FilePartitionerThread(fileDir1, parts1);
+        Thread fpt2 = new FilePartitionerThread(fileDir2, parts2);
+        Thread fpt3 = new FilePartitionerThread(fileDir3, parts3);
+
+        fpt1.start();
+        fpt2.start();
+        fpt3.start();
+
+        fpt1.join();
+        fpt2.join();
+        fpt3.join();
     }
 }
