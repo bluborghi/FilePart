@@ -1,9 +1,9 @@
 package dev.blu;
 
-import java.io.*;
+
 import java.time.LocalTime;
 
-import static java.time.temporal.ChronoUnit.SECONDS;
+import static java.time.temporal.ChronoUnit.MILLIS;
 
 public class Main {
 
@@ -26,12 +26,16 @@ public class Main {
         Thread fpt2 = new FilePartitionerThread(fileDir2, parts2);
         Thread fpt3 = new FilePartitionerThread(fileDir3, parts3);
 
+        LocalTime t0 = LocalTime.now();
+
         fpt1.start();
         fpt2.start();
         fpt3.start();
-
         fpt1.join();
         fpt2.join();
         fpt3.join();
+
+        LocalTime t1 = LocalTime.now();
+        System.out.println("(total) time: "+ MILLIS.between(t0,t1)+"ms");
     }
 }

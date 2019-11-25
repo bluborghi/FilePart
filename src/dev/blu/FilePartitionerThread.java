@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.time.LocalTime;
 
 import static java.time.temporal.ChronoUnit.MILLIS;
-import static java.time.temporal.ChronoUnit.SECONDS;
 
 public class FilePartitionerThread extends Thread {
     private String fileDir;
