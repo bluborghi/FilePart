@@ -6,18 +6,16 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 public class FileMerger extends FileHandler {
-    private File f;
+    protected File f;
+    protected int bufferLength;
 
-    public FileMerger(File f) {
+    public FileMerger(File f, int bufferLength) {
         setFile(f);
+        setBufferLength(bufferLength);
     }
 
-    public File getFile() {
-        return f;
-    }
-
-    protected void setFile(File f1) {
-        this.f = f1;
+    public FileMerger(File f){
+        this(f,1024*1024); //1MiB standard buffer
     }
 
     public int merge() throws IOException {
@@ -54,5 +52,23 @@ public class FileMerger extends FileHandler {
         }
         fos.close();
         return 0;
+    }
+
+    public File getFile() {
+        return f;
+    }
+
+    protected void setFile(File f1) {
+        this.f = f1;
+    }
+
+    @Override
+    public int getBufferLength() {
+        return bufferLength;
+    }
+
+    @Override
+    public void setBufferLength(int bufferLength) {
+        this.bufferLength = bufferLength;
     }
 }
