@@ -1,6 +1,7 @@
 package dev.blu;
 
 
+import java.io.File;
 import java.time.LocalTime;
 
 import static java.time.temporal.ChronoUnit.MILLIS;
@@ -14,10 +15,10 @@ public class Main {
 
         System.out.println("no args, using default hardcoded...");
 
-        parts1 = 4;
-        fileDir1 = "D:\\FilePart\\Debian.iso";
+        parts1 = 7;
+        fileDir1 = "D:\\FilePart\\war3.7z";
         parts2 = 5;
-        fileDir2 = "D:\\FilePart\\UserBenchMark.exe";
+        fileDir2 = "D:\\FilePart\\prob.pdf";
         parts3 = 8;
         fileDir3 = "D:\\FilePart\\trial.jpg";
 
@@ -36,6 +37,8 @@ public class Main {
         fpt3.join();
 
         LocalTime t1 = LocalTime.now();
-        System.out.println("(total) time: "+ MILLIS.between(t0,t1)+"ms");
+        long tot_size = new File(fileDir1).length() +new File(fileDir2).length() +new File(fileDir3).length();
+        tot_size = tot_size / 1024 / 1024; //MB
+        System.out.println("(total "+tot_size+" MiB) time: "+ MILLIS.between(t0,t1)+"ms");
     }
 }
