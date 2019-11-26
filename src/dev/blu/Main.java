@@ -38,7 +38,7 @@ public class Main {
 
         LocalTime t1 = LocalTime.now();
         long tot_size = new File(fileDir1).length() +new File(fileDir2).length() +new File(fileDir3).length();
-        tot_size = tot_size / 1024 / 1024; //MB
+        tot_size = tot_size / 1024 / 1024; //MiB
         System.out.println("(total "+tot_size+" MiB) time: "+ MILLIS.between(t0,t1)+"ms");
     }
 }

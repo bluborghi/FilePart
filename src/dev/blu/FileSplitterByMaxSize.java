@@ -3,12 +3,18 @@ package dev.blu;
 import java.io.*;
 
 public class FileSplitterByMaxSize extends FileSplitter {
-    private File f;
-    private long maxSize;
+    protected File f;
+    protected long maxSize;
+    protected int bufferLength;
 
-    public FileSplitterByMaxSize(File f, long maxSize) {
+    public FileSplitterByMaxSize(File f, long maxSize, int bufferLength) {
         setFile(f);
         setMaxSize(maxSize);
+        setBufferLength(bufferLength);
+    }
+
+    public FileSplitterByMaxSize(File f, long maxSize) {
+        this(f,maxSize,1024*1024); //1MiB standard buffer
     }
 
     @Override
@@ -65,5 +71,15 @@ public class FileSplitterByMaxSize extends FileSplitter {
 
     protected void setMaxSize(long maxSize) {
         this.maxSize = maxSize;
+    }
+
+    @Override
+    public int getBufferLength() {
+        return bufferLength;
+    }
+
+    @Override
+    public void setBufferLength(int bufferLength) {
+        this.bufferLength = bufferLength;
     }
 }
