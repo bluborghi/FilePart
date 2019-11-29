@@ -5,7 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-public class FileMerger extends FileHandler {
+public class FileMerger {
     protected File f;
     protected int bufferLength;
 
@@ -15,7 +15,7 @@ public class FileMerger extends FileHandler {
     }
 
     public FileMerger(File f){
-        this(f,1024*1024); //1MiB standard buffer
+        this(f,0); //use default
     }
 
     public int merge() throws IOException {
@@ -45,7 +45,10 @@ public class FileMerger extends FileHandler {
         while ((tmp = new File(parent + prefix + "." + String.format("%0" + ext.length() + "d", i))).exists()) { //C:\files\photo.png.i
             FileInputStream fis = new FileInputStream(tmp);
 
-            transfer(fis, fos, tmp.length());
+            if (getBufferLength()==0) //if bufferLength is set to default (0)
+                FileHelper.transfer(fis, fos, tmp.length());
+            else
+                FileHelper.transfer(fis,fos,tmp.length(),getBufferLength());
 
             fis.close();
             i++;
@@ -62,13 +65,14 @@ public class FileMerger extends FileHandler {
         this.f = f1;
     }
 
-    @Override
     public int getBufferLength() {
         return bufferLength;
     }
 
-    @Override
     public void setBufferLength(int bufferLength) {
-        this.bufferLength = bufferLength;
+        if (bufferLength<0)
+            this.bufferLength = 0; //if invalid, set to default
+        else
+            this.bufferLength = bufferLength;
     }
 }

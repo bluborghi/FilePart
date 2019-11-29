@@ -1,5 +1,7 @@
 package dev.blu;
 
-public abstract class FileSplitter extends FileHandler {
-    public abstract int spilt();
+import java.io.File;
+
+public interface FileSplitter {
+    int spilt();
 }

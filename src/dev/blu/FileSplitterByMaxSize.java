@@ -2,7 +2,7 @@ package dev.blu;
 
 import java.io.*;
 
-public class FileSplitterByMaxSize extends FileSplitter {
+public class FileSplitterByMaxSize implements FileSplitter {
     protected File f;
     protected long maxSize;
     protected int bufferLength;
@@ -39,9 +39,9 @@ public class FileSplitterByMaxSize extends FileSplitter {
 
 
                 if (i < parts) {
-                    transfer(fis, fos, part_length);
+                    FileHelper.transfer(fis, fos, part_length);
                 } else
-                    transfer(fis, fos, last_part_length);
+                    FileHelper.transfer(fis, fos, last_part_length);
 
                 fos.close();
 
@@ -73,12 +73,10 @@ public class FileSplitterByMaxSize extends FileSplitter {
         this.maxSize = maxSize;
     }
 
-    @Override
     public int getBufferLength() {
         return bufferLength;
     }
 
-    @Override
     public void setBufferLength(int bufferLength) {
         this.bufferLength = bufferLength;
     }
