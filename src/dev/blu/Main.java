@@ -49,7 +49,7 @@ public class Main {
 
             File in = new File("/run/media/blubo/Volume/FilePart/trial.jpg");
             FileCipher fc = new FileCipher(in);
-            File out = fc.Encrypt("ciaone");
+            File out = fc.Encrypt("OEUFHEOFEW");
             FileCipher fc2 = new FileCipher(out);
             fc2.Decrypt("OEUFHEOFEW");
         } catch (BadPaddingException e){
