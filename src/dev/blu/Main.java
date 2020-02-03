@@ -1,15 +1,19 @@
 package dev.blu;
 
 
+import javax.crypto.BadPaddingException;
 import java.io.File;
+import java.io.IOException;
+import java.security.SecureRandom;
 import java.time.LocalTime;
+import java.util.zip.CRC32;
 
 import static java.time.temporal.ChronoUnit.MILLIS;
 
 public class Main {
 
     public static void main(String[] args) throws InterruptedException {
-        String fileDir1, fileDir2, fileDir3;
+       /* String fileDir1, fileDir2, fileDir3;
         int parts1, parts2, parts3;
 
 
@@ -39,6 +43,19 @@ public class Main {
         LocalTime t1 = LocalTime.now();
         long tot_size = new File(fileDir1).length() +new File(fileDir2).length() +new File(fileDir3).length();
         tot_size = tot_size / 1024 / 1024; //MiB
-        System.out.println("(total "+tot_size+" MiB) time: "+ MILLIS.between(t0,t1)+"ms");
+        System.out.println("(total "+tot_size+" MiB) time: "+ MILLIS.between(t0,t1)+"ms");*/
+
+        try {
+
+            File in = new File("/run/media/blubo/Volume/FilePart/trial.jpg");
+            FileCipher fc = new FileCipher(in);
+            File out = fc.Encrypt("ciaone");
+            FileCipher fc2 = new FileCipher(out);
+            fc2.Decrypt("OEUFHEOFEW");
+        } catch (BadPaddingException e){
+            System.err.println("WRONG PASSWORD");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.zip.CRC32;
 
 public class FileHelper {
     private final static int DEFAULT_BUFFER_LENGTH = 1024 * 1024 * 1; //1MiB
@@ -56,5 +57,25 @@ public class FileHelper {
         buffer = new byte[last_buffer_length];
         fis.read(buffer);
         fos.write(buffer);
+    }
+
+    public static CRC32 getFileCRC32(File f, int maxBufferLength) throws IOException {
+        FileInputStream fis = new FileInputStream(f);
+        CRC32 crc = new CRC32();
+        byte[] buffer;
+
+        while (fis.available()>=maxBufferLength){
+            buffer = new byte[maxBufferLength];
+            fis.read(buffer);
+            crc.update(buffer);
+        }
+        int reminder = fis.available();
+        if (reminder>0 && reminder<maxBufferLength){
+            buffer = new byte[reminder];
+            fis.read(buffer);
+            crc.update(buffer);
+        }
+
+        return crc;
     }
 }
