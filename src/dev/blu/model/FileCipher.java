@@ -1,9 +1,12 @@
-package dev.blu;
+package dev.blu.model;
 
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
+
+import static dev.blu.model.FileHelper.*;
+
 import java.io.*;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -12,8 +15,6 @@ import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.util.zip.CRC32;
-
-import static dev.blu.FileHelper.*;
 
 /* HOW CRC WORKS
 

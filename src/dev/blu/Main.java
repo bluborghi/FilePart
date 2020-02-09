@@ -2,6 +2,11 @@ package dev.blu;
 
 
 import javax.crypto.BadPaddingException;
+
+import dev.blu.controller.AppController;
+import dev.blu.model.FileCipher;
+import dev.blu.view.AppView;
+
 import java.io.File;
 import java.io.IOException;
 import java.security.SecureRandom;
@@ -45,7 +50,7 @@ public class Main {
         tot_size = tot_size / 1024 / 1024; //MiB
         System.out.println("(total "+tot_size+" MiB) time: "+ MILLIS.between(t0,t1)+"ms");*/
 
-        try {
+        /*try {
 
             File in = new File("/run/media/blubo/Volume/FilePart/trial.jpg");
             FileCipher fc = new FileCipher(in);
@@ -56,6 +61,12 @@ public class Main {
             System.err.println("WRONG PASSWORD");
         } catch (Exception e) {
             e.printStackTrace();
-        }
+        }*/
+    	
+    	
+    	AppView view = new AppView();
+    	AppController controller = new AppController(view);
+    	//AppController controller = new AppController(view);
+    	view.setVisible(true);
     }
 }
