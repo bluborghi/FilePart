@@ -63,10 +63,11 @@ public class Main {
             e.printStackTrace();
         }*/
     	
+
+    	
     	
     	AppView view = new AppView();
     	AppController controller = new AppController(view);
-    	//AppController controller = new AppController(view);
-    	view.setVisible(true);
+    	view.setVisible(true); 
     }
 }

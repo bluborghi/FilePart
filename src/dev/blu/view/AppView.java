@@ -6,6 +6,7 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
@@ -30,6 +31,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.RowSpec;
 
+import dev.blu.model.FileTableModel;
 
 import com.jgoodies.forms.layout.FormSpecs;
 import java.awt.GridLayout;
@@ -38,6 +40,8 @@ import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import net.miginfocom.swing.MigLayout;
 import javax.swing.JPasswordField;
+import java.awt.Font;
+import javax.swing.JTable;
 
 public class AppView extends JFrame {
 
@@ -50,8 +54,10 @@ public class AppView extends JFrame {
 	private JButton addButton;
 	private JButton removeButton;
 	private JButton startButton;
-	private JList<File> fileList;
 	private DefaultListModel<File> dlm;
+	private FileTableModel ftm;
+	private JLabel lblStatus;
+	private JTable fileList;
 	
 	public AppView() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -133,20 +139,24 @@ public class AppView extends JFrame {
 		
 		JScrollPane scrollPane = new JScrollPane();
 		contentPane.add(scrollPane, BorderLayout.CENTER);
+		 
+		fileList = new JTable(ftm);
+		fileList.setRowSelectionAllowed(true);
+
+		scrollPane.setViewportView(fileList);
 		
 		dlm = new DefaultListModel<File>();
-		fileList = new JList<File>(dlm);
-		scrollPane.setViewportView(fileList);
 		
 		JPanel panel_2 = new JPanel();
 		FlowLayout flowLayout_1 = (FlowLayout) panel_2.getLayout();
 		flowLayout_1.setAlignment(FlowLayout.LEFT);
 		contentPane.add(panel_2, BorderLayout.SOUTH);
 		
-		JLabel lblStatus = new JLabel("");
+		lblStatus = new JLabel("");
+		lblStatus.setFont(new Font("Dialog", Font.PLAIN, 10));
 		panel_2.add(lblStatus);
 		
-		Component verticalStrut = Box.createVerticalStrut(10);
+		Component verticalStrut = Box.createVerticalStrut(15);
 		panel_2.add(verticalStrut);
 		
 		fileChooser = new JFileChooser();
@@ -168,19 +178,41 @@ public class AppView extends JFrame {
 		startButton.addActionListener(buttonActionListener);
 	}
 
+	public void addFile(File file, boolean selectNewFile) {
+		if (file!= null) 
+			ftm.addFile(file);
+		//TODO selectNewFile logic!!!
+		//fileList.changeSelection(rowIndex, columnIndex, toggle, extend);
+	}
+
 	public void addFile(File file) {
-		dlm.addElement(file);
+		//dlm.addElement(file);
+		ftm.addFile(file);
 	}
 	
-	public void removeFile(File file) {
+	public void removeFile(int index) {
 		//System.out.println(dlm);
-		dlm.removeElement((Object) file);
+		//dlm.removeElement((Object) file);
 		//System.out.println(dlm);
+		ftm.removeFileAt(index);
+	}
+
+	public void setFileListSelectionListener(ListSelectionListener listSelectionListener) {
+		fileList.getSelectionModel().addListSelectionListener(listSelectionListener);
 	}
 
 	public File getSelectedFile() {
-		return fileList.getSelectedValue();
+		int row = fileList.getSelectedRow();
+		if (row == -1) 
+			return null;
+		else
+			return (File) fileList.getValueAt(row, 0);
 	}
+	
+	public void showStatus(String status) {
+		lblStatus.setText(status);
+	}
+
 	
 
 	

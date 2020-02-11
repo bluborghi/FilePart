@@ -5,17 +5,21 @@ import java.awt.event.ActionListener;
 import java.io.File;
 
 import javax.swing.JFileChooser;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import dev.blu.view.AppView;
 
 public class AppController {
 	private AppView view;
 	
+	
 	public AppController(AppView view) {
 		setView(view);
 
 		view.setAddButtonActionListener(new AddButtonActionListener());
 		view.setRemoveButtonActionListener(new RemoveButtonActionListener());
+		//view.setFileListSelectionListener(new FileListSelectionListener());
 	}
 
 	public AppView getView() {
@@ -38,7 +42,6 @@ public class AppController {
 				File file = fc.getSelectedFile();
 				System.out.println("Opening: " + file.getAbsolutePath());
 				view.addFile(file);
-				
 			} else {
 				System.out.println("Open command cancelled by user.");
 			}
@@ -57,4 +60,22 @@ public class AppController {
 		}
 	}
 	
+	class FileListSelectionListener implements ListSelectionListener {
+		@Override
+		public void valueChanged(ListSelectionEvent e) {
+			AppView view = getView();
+			File current = view.getSelectedFile();
+			if (current != null) {
+				view.showStatus("Current File: " + current.getName());	
+				
+				//WIP fill split options combo box
+				
+				
+				//--------------------------------
+			}
+			else {
+				view.showStatus("");	
+			}
+		}
+	}
 }
