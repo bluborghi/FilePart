@@ -2,24 +2,34 @@ package dev.blu.controller;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.util.UUID;
 
 import javax.swing.JFileChooser;
+import javax.swing.JFormattedTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.text.Document;
+import javax.swing.text.Element;
 
 import dev.blu.view.AppView;
 
 public class AppController {
 	private AppView view;
-	
-	
+
 	public AppController(AppView view) {
 		setView(view);
 
 		view.setAddButtonActionListener(new AddButtonActionListener());
 		view.setRemoveButtonActionListener(new RemoveButtonActionListener());
-		//view.setFileListSelectionListener(new FileListSelectionListener());
+		view.setFileListSelectionListener(new FileListSelectionListener());
+		view.setFocusListener(new FocusTest());
 	}
 
 	public AppView getView() {
@@ -29,11 +39,11 @@ public class AppController {
 	public void setView(AppView view) {
 		this.view = view;
 	}
-	
+
 	class AddButtonActionListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			//System.out.println("add action performed");
+			// System.out.println("add action performed");
 			AppView view = getView();
 			JFileChooser fc = view.getFileChooser();
 			int returnVal = fc.showOpenDialog(view);
@@ -47,35 +57,80 @@ public class AppController {
 			}
 		}
 	}
-	
+
 	class RemoveButtonActionListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			//System.out.println("remove action performed");
+			// System.out.println("remove action performed");
 			AppView view = getView();
-			File file = view.getSelectedFile();
-			if (file != null) {
-				view.removeFile(file);				
+			int file_index = view.getSelectedInedex();
+			if (file_index != -1) {
+				view.removeFile(file_index);
 			}
 		}
 	}
-	
+
 	class FileListSelectionListener implements ListSelectionListener {
 		@Override
 		public void valueChanged(ListSelectionEvent e) {
 			AppView view = getView();
 			File current = view.getSelectedFile();
 			if (current != null) {
-				view.showStatus("Current File: " + current.getName());	
-				
-				//WIP fill split options combo box
-				
-				
-				//--------------------------------
-			}
-			else {
-				view.showStatus("");	
+				view.showStatus("Current File: " + current.getPath());
+				view.loadConfig();
+			} else {
+				view.showStatus("");
 			}
 		}
 	}
+
+	class SizePropertyChangeListener implements PropertyChangeListener {
+		@Override
+		public void propertyChange(PropertyChangeEvent evt) {
+			if (view.getCurrentConfig() != null) {
+				if (evt.getSource() instanceof JFormattedTextField) {
+					JFormattedTextField txtfield = (JFormattedTextField) evt.getSource();
+					System.out.println(txtfield);
+					Object val = txtfield.getValue();
+
+					if (val instanceof Long)
+						view.getCurrentConfig().setPartSize((long) val);
+				}
+			}
+		}
+	}
+
+	class PartsPropertyChangeListener implements PropertyChangeListener {
+		@Override
+		public void propertyChange(PropertyChangeEvent evt) {
+			if (view.getCurrentConfig() != null) {
+				if (evt.getSource() instanceof JFormattedTextField) {
+					JFormattedTextField txtfield = (JFormattedTextField) evt.getSource();
+					System.out.println(txtfield);
+					Object val = txtfield.getValue();
+					if (val instanceof Long) {
+						view.getCurrentConfig().setPartNumber((long) val);
+					}
+				}
+			}
+		}
+	}
+
+	class FocusTest implements FocusListener {
+
+		@Override
+		public void focusGained(FocusEvent e) {
+			System.out.println("focusGained" + e.getSource().getClass());
+		}
+
+		@Override
+		public void focusLost(FocusEvent e) {
+			System.out.println("focusLost" + e.getSource().getClass());
+			view.saveConfig();
+		}
+		
+	}
+
+	
+
 }
