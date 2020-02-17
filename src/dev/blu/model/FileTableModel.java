@@ -9,11 +9,13 @@ import javax.swing.table.AbstractTableModel;
 public class FileTableModel extends AbstractTableModel {
 	private Vector<File> files;
 	private Vector<UUID> ids;
+	private Vector<ProcessStatus> states;
 	private String[] cols = {"Name","Status"};
 	
 	public FileTableModel() {
 		files = new Vector<File>(0,5);
 		ids = new Vector<UUID>(0,5);
+		states = new Vector<ProcessStatus>(0,5);
 	}
 	
 	@Override
@@ -32,7 +34,7 @@ public class FileTableModel extends AbstractTableModel {
 			return files.get(rowIndex).getName();
 		}
 		if (columnIndex == 1) {
-			return "WIP";
+			return states.get(rowIndex).toString();
 		}
 		return null;
 	}
@@ -49,7 +51,7 @@ public class FileTableModel extends AbstractTableModel {
 	public void addFile(File file) {
 		files.add(file);
 		ids.add(UUID.randomUUID());
-		
+		states.add(ProcessStatus.Ready);
 		fireTableRowsInserted(getRowCount(),getRowCount());
 	}
 
@@ -64,11 +66,35 @@ public class FileTableModel extends AbstractTableModel {
 		return 0;
 	}
 	
+	public void setProcessStatus(int index, ProcessStatus ps) {
+		try {
+			if (index == states.size())
+				throw new IndexOutOfBoundsException();
+			
+			states.set(index, ps); //also throws IndexOutOfBoundsException
+		} catch (IndexOutOfBoundsException e) {
+	
+		}
+	}
+	
 	public UUID getId(int index) {
-		return ids.get(index);
+		try {
+			return ids.get(index);			
+		} catch (IndexOutOfBoundsException e) {
+			return null;
+		}
 	}
 
 	public File getFile(int index) {
 		return files.get(index);
+	}
+	
+	public ProcessStatus getProcessStatus(int index) {
+		return states.get(index);
+	}
+
+	public File getFile(UUID id) {
+		int index = ids.indexOf(id);
+		return getFile(index);
 	}
 }

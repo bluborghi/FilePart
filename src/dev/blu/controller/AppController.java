@@ -8,6 +8,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.UUID;
+import java.util.Vector;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFormattedTextField;
@@ -18,6 +19,9 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.text.Document;
 import javax.swing.text.Element;
 
+import dev.blu.model.FileSplitterByPartNumberThread;
+import dev.blu.model.SplitConfiguration;
+import dev.blu.model.SplitOption;
 import dev.blu.view.AppView;
 
 public class AppController {
@@ -28,6 +32,7 @@ public class AppController {
 
 		view.setAddButtonActionListener(new AddButtonActionListener());
 		view.setRemoveButtonActionListener(new RemoveButtonActionListener());
+		view.setStartButtonActionListener(new StartButtonActionListener());
 		view.setFileListSelectionListener(new FileListSelectionListener());
 		view.setFocusListener(new DetailsPanelFocusListener());
 	}
@@ -66,6 +71,27 @@ public class AppController {
 			int file_index = view.getSelectedInedex();
 			if (file_index != -1) {
 				view.removeFile(file_index);
+			}
+		}
+	}
+	
+	class StartButtonActionListener implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			AppView view = getView();
+			Vector<SplitConfiguration> queue = view.getQueue();
+			for (SplitConfiguration c : queue){
+				System.out.println(c.getFile().getAbsolutePath());
+				
+				switch (c.getSplitOption()) {
+					case DoNothing:{
+						break;
+					}
+					case SplitByPartNumber:{
+						new FileSplitterByPartNumberThread(c.getFile(),c.getPartNumber()).start();
+						break;
+					}
+				}
 			}
 		}
 	}

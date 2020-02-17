@@ -27,6 +27,7 @@ import java.io.File;
 import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.Vector;
 import java.awt.event.ActionEvent;
 import java.awt.Dimension;
 import javax.swing.JLayeredPane;
@@ -272,17 +273,26 @@ public class AppView extends JFrame {
 	public int getSelectedInedex() {
 		return fileList.getSelectedRow();
 	}
-
-	public SplitConfiguration getCurrentConfig() {
-		UUID id = getSelectedId();
+	
+	private SplitConfiguration getConfigById(UUID id) {
 		if (id == null)
 			return null;
 		SplitConfiguration config = configs.get(id);
 		if (config == null) {
-			config = new SplitConfiguration();
+			config = new SplitConfiguration( ftm.getFile(id) );
 			configs.put(id, config);
 		}
 		return config;
+	}
+	
+	public SplitConfiguration getConfig(int index) {
+		UUID id = ftm.getId(index);
+		return getConfigById(id);
+	}
+
+	public SplitConfiguration getCurrentConfig() {
+		UUID id = getSelectedId();
+		return getConfigById(id);
 	}
 
 	public void loadConfig() {
@@ -332,6 +342,18 @@ public class AppView extends JFrame {
 		} else
 			txt.setValue(i);
 	}
+
+	public Vector<SplitConfiguration> getQueue() {
+		Vector<SplitConfiguration> queue = new Vector<SplitConfiguration>(); 
+		
+		for (int i = 0; i<ftm.getRowCount(); i++) {
+			SplitConfiguration config = getConfig(i);
+			queue.add(config);
+		}
+		
+		return queue;
+	}
+
 
 	
 
