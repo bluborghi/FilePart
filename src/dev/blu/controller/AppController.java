@@ -29,7 +29,7 @@ public class AppController {
 		view.setAddButtonActionListener(new AddButtonActionListener());
 		view.setRemoveButtonActionListener(new RemoveButtonActionListener());
 		view.setFileListSelectionListener(new FileListSelectionListener());
-		view.setFocusListener(new FocusTest());
+		view.setFocusListener(new DetailsPanelFocusListener());
 	}
 
 	public AppView getView() {
@@ -84,48 +84,15 @@ public class AppController {
 		}
 	}
 
-	class SizePropertyChangeListener implements PropertyChangeListener {
-		@Override
-		public void propertyChange(PropertyChangeEvent evt) {
-			if (view.getCurrentConfig() != null) {
-				if (evt.getSource() instanceof JFormattedTextField) {
-					JFormattedTextField txtfield = (JFormattedTextField) evt.getSource();
-					System.out.println(txtfield);
-					Object val = txtfield.getValue();
-
-					if (val instanceof Long)
-						view.getCurrentConfig().setPartSize((long) val);
-				}
-			}
-		}
-	}
-
-	class PartsPropertyChangeListener implements PropertyChangeListener {
-		@Override
-		public void propertyChange(PropertyChangeEvent evt) {
-			if (view.getCurrentConfig() != null) {
-				if (evt.getSource() instanceof JFormattedTextField) {
-					JFormattedTextField txtfield = (JFormattedTextField) evt.getSource();
-					System.out.println(txtfield);
-					Object val = txtfield.getValue();
-					if (val instanceof Long) {
-						view.getCurrentConfig().setPartNumber((long) val);
-					}
-				}
-			}
-		}
-	}
-
-	class FocusTest implements FocusListener {
+	class DetailsPanelFocusListener implements FocusListener {
 
 		@Override
 		public void focusGained(FocusEvent e) {
-			System.out.println("focusGained" + e.getSource().getClass());
+			
 		}
 
 		@Override
 		public void focusLost(FocusEvent e) {
-			System.out.println("focusLost" + e.getSource().getClass());
 			view.saveConfig();
 		}
 		

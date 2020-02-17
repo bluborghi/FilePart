@@ -206,20 +206,12 @@ public class AppView extends JFrame {
 		fileList.getSelectionModel().addListSelectionListener(listSelectionListener);
 	}
 
-	public void setPartsPropertyChangeListener(PropertyChangeListener pcl) {
-		txtParts.addPropertyChangeListener("value", pcl);
+	public void setFocusListener(FocusListener fl) {
+		for (Component c : detailsPanel.getComponents()) {
+			c.addFocusListener(fl);
+		}
 	}
-
-	public void setSizePropertyChangeListener(PropertyChangeListener pcl) {
-		txtSize.addPropertyChangeListener("value", pcl);
-	}
-
-	public void setDetailsPanelPropertyChangeListener(PropertyChangeListener pcl) {
-		txtParts.addPropertyChangeListener("value", pcl);
-		txtSize.addPropertyChangeListener("value", pcl);
-		splitOptions.addPropertyChangeListener("selectedIndex",pcl);
-	}
-
+	
 	public void addFile(File file, boolean selectNewFile) {
 		System.out.println("added file " + file.getName());
 		if (file != null) {
@@ -312,7 +304,7 @@ public class AppView extends JFrame {
 		if (pw != null) {
 			for (char c : pw) {
 				p = p + c;
-			}			
+			} 			
 		}
 		passwordField.setText(p);
 	}
@@ -341,10 +333,6 @@ public class AppView extends JFrame {
 			txt.setValue(i);
 	}
 
-	public void setFocusListener(FocusListener fl) {
-		for (Component c : detailsPanel.getComponents()) {
-			c.addFocusListener(fl);
-		}
-	}
+	
 
 }
