@@ -41,6 +41,7 @@ import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.RowSpec;
 
 import dev.blu.model.FileTableModel;
+import dev.blu.model.ProcessStatus;
 import dev.blu.model.SplitConfiguration;
 import dev.blu.model.SplitOption;
 import dev.blu.model.ByteUnit;
@@ -279,7 +280,7 @@ public class AppView extends JFrame {
 			return null;
 		SplitConfiguration config = configs.get(id);
 		if (config == null) {
-			config = new SplitConfiguration( ftm.getFile(id) );
+			config = new SplitConfiguration( id );
 			configs.put(id, config);
 		}
 		return config;
@@ -354,7 +355,20 @@ public class AppView extends JFrame {
 		return queue;
 	}
 
+	public void setProcessStatus(UUID id, ProcessStatus ps) {
+		ftm.setProcessStatus(id, ps);
+	}
 
-	
+	public File getFile(UUID id) {
+		return ftm.getFile(id);
+	}
+
+	public void setPercentage(UUID id, double percentage) {
+		ftm.setPercentage(id, percentage);
+	}
+
+	public void setEnabledStartButton(boolean b) {
+		startButton.setEnabled(b);
+	}
 
 }

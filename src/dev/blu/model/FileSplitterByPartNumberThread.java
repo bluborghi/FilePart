@@ -28,7 +28,7 @@ public class FileSplitterByPartNumberThread extends Thread {
     @Override
     public void run() {
         FileSplitter fs = new FileSplitterByPartNumber(new File(getFileDir()),getParts());
-		fs.spilt();
+		fs.split();
     }
 
     public String getFileDir() {

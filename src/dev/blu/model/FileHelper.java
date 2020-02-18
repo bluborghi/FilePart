@@ -31,11 +31,11 @@ public class FileHelper {
         return fileName.lastIndexOf(".") != -1 && fileName.lastIndexOf(".") != 0;
     }
 
-    public static void transfer(FileInputStream fis, FileOutputStream fos, long partLength) throws IOException {
-        transfer(fis,fos,partLength, DEFAULT_BUFFER_LENGTH);
+    public static void transfer(FileInputStream fis, FileOutputStream fos, long partLength, long[] bytesTransferd) throws IOException {
+        transfer(fis,fos,partLength, DEFAULT_BUFFER_LENGTH, bytesTransferd);
     }
 
-    public static void transfer(FileInputStream fis, FileOutputStream fos, long partLength, int maxBufferLength) throws IOException {
+    public static void transfer(FileInputStream fis, FileOutputStream fos, long partLength, int maxBufferLength, long[] bytesTransferd) throws IOException {
         int buffer_length;
         int last_buffer_length;
         byte[] buffer;
@@ -49,6 +49,7 @@ public class FileHelper {
             for (long i = numberOfTransfers; i > 1; i--) { //only if there's more than one part (you need to transfer more bytes than the buffer size)
                 fis.read(buffer);
                 fos.write(buffer);
+                bytesTransferd[0]+=buffer.length;
             }
         } else {
             last_buffer_length = (int) partLength; //cast to int is ok (partLength <= MAX_BUF_LENGTH)
@@ -57,6 +58,7 @@ public class FileHelper {
         buffer = new byte[last_buffer_length];
         fis.read(buffer);
         fos.write(buffer);
+        bytesTransferd[0]+=buffer.length;
     }
 
     public static CRC32 getFileCRC32(File f, int maxBufferLength) throws IOException {

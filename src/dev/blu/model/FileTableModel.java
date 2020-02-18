@@ -10,12 +10,14 @@ public class FileTableModel extends AbstractTableModel {
 	private Vector<File> files;
 	private Vector<UUID> ids;
 	private Vector<ProcessStatus> states;
-	private String[] cols = {"Name","Status"};
+	private Vector<Integer> percentages;
+	private String[] cols = {"Name","Status","%"};
 	
 	public FileTableModel() {
 		files = new Vector<File>(0,5);
 		ids = new Vector<UUID>(0,5);
 		states = new Vector<ProcessStatus>(0,5);
+		percentages = new Vector<Integer>(0,5);
 	}
 	
 	@Override
@@ -36,6 +38,14 @@ public class FileTableModel extends AbstractTableModel {
 		if (columnIndex == 1) {
 			return states.get(rowIndex).toString();
 		}
+		if (columnIndex == 2) {
+			if (states.get(rowIndex) == ProcessStatus.Running) {
+				if (percentages.get(rowIndex) != -1) {
+					return percentages.get(rowIndex).toString();					
+				}
+			} 
+			return "";
+		}
 		return null;
 	}
 	
@@ -52,6 +62,7 @@ public class FileTableModel extends AbstractTableModel {
 		files.add(file);
 		ids.add(UUID.randomUUID());
 		states.add(ProcessStatus.Ready);
+		percentages.add(-1);
 		fireTableRowsInserted(getRowCount(),getRowCount());
 	}
 
@@ -66,14 +77,20 @@ public class FileTableModel extends AbstractTableModel {
 		return 0;
 	}
 	
+	public void setProcessStatus(UUID id, ProcessStatus ps) {
+		int index = ids.indexOf(id);
+		setProcessStatus(index, ps);
+	}
+	
 	public void setProcessStatus(int index, ProcessStatus ps) {
 		try {
 			if (index == states.size())
 				throw new IndexOutOfBoundsException();
 			
 			states.set(index, ps); //also throws IndexOutOfBoundsException
+			fireTableRowsUpdated(index, index);
 		} catch (IndexOutOfBoundsException e) {
-	
+			System.err.println("cant set index "+index+" because out of bounds (maybe exceeded states.size() = "+states.size()+")");
 		}
 	}
 	
@@ -89,12 +106,25 @@ public class FileTableModel extends AbstractTableModel {
 		return files.get(index);
 	}
 	
+	public File getFile(UUID id) {
+		int index = ids.indexOf(id);
+		return getFile(index);
+	}
+	
+	public int getIndex(UUID id) {
+		return ids.indexOf(id);
+	}
+	
 	public ProcessStatus getProcessStatus(int index) {
 		return states.get(index);
 	}
 
-	public File getFile(UUID id) {
-		int index = ids.indexOf(id);
-		return getFile(index);
+	
+
+	public void setPercentage(UUID id, double percentage) {
+		int index = getIndex(id);
+		//System.out.println("setting "+ percentages.get(index)+ " at index " + index + " => " + Math.round(percentage));
+		percentages.set(index, (int) Math.round(percentage));
+		fireTableRowsUpdated(index, index);
 	}
 }

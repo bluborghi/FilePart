@@ -7,6 +7,8 @@ import java.awt.event.FocusListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.Vector;
 
@@ -19,10 +21,16 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.text.Document;
 import javax.swing.text.Element;
 
+import dev.blu.model.FileActionThread;
+import dev.blu.model.FileMerger;
+import dev.blu.model.FileSplitterByMaxSize;
+import dev.blu.model.FileSplitterByPartNumber;
 import dev.blu.model.FileSplitterByPartNumberThread;
+import dev.blu.model.ProcessStatus;
 import dev.blu.model.SplitConfiguration;
 import dev.blu.model.SplitOption;
 import dev.blu.view.AppView;
+import dev.blu.model.FileActionThread;
 
 public class AppController {
 	private AppView view;
@@ -74,25 +82,55 @@ public class AppController {
 			}
 		}
 	}
-	
+
 	class StartButtonActionListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			AppView view = getView();
 			Vector<SplitConfiguration> queue = view.getQueue();
-			for (SplitConfiguration c : queue){
-				System.out.println(c.getFile().getAbsolutePath());
+			HashMap<UUID,FileActionThread> threads = new HashMap<UUID,FileActionThread>();
+			
+			for (SplitConfiguration c : queue) {
 				
 				switch (c.getSplitOption()) {
-					case DoNothing:{
-						break;
-					}
-					case SplitByPartNumber:{
-						new FileSplitterByPartNumberThread(c.getFile(),c.getPartNumber()).start();
-						break;
-					}
+				case DoNothing: {
+					break;
 				}
+				case Merge: {
+					File f = view.getFile(c.getId());
+					FileActionThread t = new FileActionThread(new FileMerger(f));
+					threads.put(c.getId(), t);
+					break;
+				}
+				case MergeAndDecrypt: {
+					break;
+				}
+				case SplitAndEncrypt: {
+					break;
+				}
+				case SplitByMaxSize: {
+					File f = view.getFile(c.getId());
+					FileActionThread t = new FileActionThread(new FileSplitterByMaxSize(f,c.getPartSize()));
+					threads.put(c.getId(), t);
+					break;
+				}
+				case SplitByPartNumber: {
+					File f = view.getFile(c.getId());
+					FileActionThread t = new FileActionThread(new FileSplitterByPartNumber(f,c.getPartNumber()));
+					threads.put(c.getId(), t);
+					break;
+				}
+				}
+				
 			}
+			
+			threads.forEach((id,t) -> {
+				t.start();
+				view.setProcessStatus(id, ProcessStatus.Running);
+			});
+			
+			new ProgressThread(threads).start();
+			view.setEnabledStartButton(false);
 		}
 	}
 
@@ -114,16 +152,41 @@ public class AppController {
 
 		@Override
 		public void focusGained(FocusEvent e) {
-			
+
 		}
 
 		@Override
 		public void focusLost(FocusEvent e) {
 			view.saveConfig();
 		}
-		
+
 	}
 
-	
-
+	class ProgressThread extends Thread {
+		HashMap<UUID,FileActionThread> threads;
+		
+		public ProgressThread(HashMap<UUID,FileActionThread> threads) {
+			this.threads = threads;
+		}
+		
+		@Override
+		public void run() {
+			boolean someoneAlive = true;
+			while (someoneAlive) {
+				someoneAlive = false;
+				for(Map.Entry<UUID, FileActionThread> entry : threads.entrySet()) {
+				    FileActionThread t = entry.getValue();
+				    UUID id = entry.getKey();
+				    if (t.isAlive()) {
+				    	someoneAlive = true;
+				    	view.setPercentage(id,t.getPercentage());
+				    }
+				    else {
+				    	view.setProcessStatus(id, ProcessStatus.Completed);
+				    }
+				}
+			}
+			view.setEnabledStartButton(true);
+		}
+	}
 }

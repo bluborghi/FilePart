@@ -1,6 +1,7 @@
 package dev.blu.model;
 
 import java.io.File;
+import java.util.UUID;
 
 public class SplitConfiguration {
 	private SplitOption splitOption;
@@ -9,11 +10,11 @@ public class SplitConfiguration {
 	private ByteUnit unit;
 	private char[] pw;
 	private String outputDir;
-	private File file;
-
-	public SplitConfiguration(File f, SplitOption splitOption, int partNumber, long partSize, ByteUnit unit, char[] pw,
+	private UUID id;
+	
+	public SplitConfiguration(UUID id, SplitOption splitOption, int partNumber, long partSize, ByteUnit unit, char[] pw,
 			String outputDir) {
-		this.file = f;
+		this.id = id;
 		this.splitOption = splitOption;
 		this.partNumber = partNumber;
 		this.partSize = partSize;
@@ -22,8 +23,8 @@ public class SplitConfiguration {
 		this.outputDir = outputDir;
 	}
 	
-	public SplitConfiguration(File f) {
-		this(f, SplitOption.DoNothing, -1, -1, ByteUnit.MiB, null , "");
+	public SplitConfiguration(UUID id) {
+		this(id, SplitOption.DoNothing, -1, -1, ByteUnit.MiB, null , "");
 	}
 
 	public SplitOption getSplitOption() {
@@ -74,9 +75,8 @@ public class SplitConfiguration {
 		this.outputDir = outputDir;
 	}
 
-	public File getFile() {
-		return file;
+	public UUID getId() {
+		return id;
 	}
-
 
 }
