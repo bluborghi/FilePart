@@ -4,8 +4,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,24 +11,15 @@ import java.util.UUID;
 import java.util.Vector;
 
 import javax.swing.JFileChooser;
-import javax.swing.JFormattedTextField;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.text.Document;
-import javax.swing.text.Element;
-
 import dev.blu.model.FileActionThread;
 import dev.blu.model.FileMerger;
 import dev.blu.model.FileSplitterByMaxSize;
 import dev.blu.model.FileSplitterByPartNumber;
-import dev.blu.model.FileSplitterByPartNumberThread;
 import dev.blu.model.ProcessStatus;
 import dev.blu.model.SplitConfiguration;
-import dev.blu.model.SplitOption;
 import dev.blu.view.AppView;
-import dev.blu.model.FileActionThread;
 
 public class AppController {
 	private AppView view;

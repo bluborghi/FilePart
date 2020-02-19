@@ -41,7 +41,7 @@ public class FileTableModel extends AbstractTableModel {
 		if (columnIndex == 2) {
 			if (states.get(rowIndex) == ProcessStatus.Running) {
 				if (percentages.get(rowIndex) != -1) {
-					return percentages.get(rowIndex).toString();					
+					return percentages.get(rowIndex).toString() + "%";					
 				}
 			} 
 			return "";

@@ -13,7 +13,7 @@ public class FileHelper {
         return new File(dir).getAbsoluteFile().getParent();
     }
 
-    public static String getFileExtension(String fileName) { //boh se no c'è string tokenizer
+    public static String getFileExtension(String fileName) { 
         if (hasExtension(fileName))
             return fileName.substring(fileName.lastIndexOf(".") + 1);
         else

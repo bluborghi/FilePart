@@ -15,6 +15,7 @@ public class FileMerger implements FileAction{
         setFile(f);
         setBufferLength(bufferLength);
         bytesTransfered[0] = 0;
+        totalBytes = 0;
     }
 
     public FileMerger(File f){
@@ -22,6 +23,7 @@ public class FileMerger implements FileAction{
     }
 
     public int merge() throws IOException {
+    	calcTotalBytes();
         /*String abs = getFile().getAbsolutePath();                                           //C:\files\photo.png
         File starter = null;
         int MAX_LENGTH = String.valueOf(Integer.MAX_VALUE).length();
@@ -36,17 +38,19 @@ public class FileMerger implements FileAction{
         if (starter == null) return -1;
 
         String full = starter.getAbsolutePath();                        //C:\files\photo.png.001
-        String name = starter.getName();                                //photo.png.001
-        String ext = FileHelper.getFileExtension(name);                            //001
-        String prefix = FileHelper.removeFileExtension(name);                      //photo.png
-        String parent = FileHelper.getParentDirectory(full) + "\\";                  //C:\files\
+        String ext = FileHelper.getFileExtension(full);                            //001
+        String outputFilePath = FileHelper.removeFileExtension(full);	//C:\files\photo.png
 
-        File output = new File(parent + "_" + prefix);          //C:\files\_photo.png
+        // String name = starter.getName();                                //photo.png.001
+       //String prefix = FileHelper.removeFileExtension(name);                      //photo.png
+       // String parent = FileHelper.getParentDirectory(full) + File.pathSeparator; //C:\files\
+        
+        File output = new File(outputFilePath);          //C:\files\photo.png
         output.createNewFile();
         FileOutputStream fos = new FileOutputStream(output);
         File tmp;
         int i = 1;
-        while ((tmp = new File(parent + prefix + "." + String.format("%0" + ext.length() + "d", i))).exists()) { //C:\files\photo.png.i
+        while ((tmp = new File(outputFilePath + "." + String.format("%0" + ext.length() + "d", i))).exists()) { //C:\files\photo.png.i
             FileInputStream fis = new FileInputStream(tmp);
 
             if (getBufferLength()==0) //if bufferLength is set to default (0)
@@ -92,7 +96,10 @@ public class FileMerger implements FileAction{
 	@Override
 	public double getPercentage() {
 		long tot = getTotalBytes();
-		return ((double)bytesTransfered[0]/tot)*100;
+		if (tot != 0)
+			return ((double)bytesTransfered[0]/tot)*100;
+		else 
+			return 0;
 	}
 
 	private long getTotalBytes() {
@@ -101,17 +108,19 @@ public class FileMerger implements FileAction{
 
 	private void calcTotalBytes() {
 		totalBytes = 0;
-		int i = 1;
-		File tmp;
 		File starter = getFile();
         if (starter == null) return;
+        
         String full = starter.getAbsolutePath();                        //C:\files\photo.png.001
-        String name = starter.getName();                                //photo.png.001
-        String ext = FileHelper.getFileExtension(name);                            //001
-        String prefix = FileHelper.removeFileExtension(name);                      //photo.png
-        String parent = FileHelper.getParentDirectory(full) + File.separatorChar;                  //C:\files\
-		while ((tmp = new File(parent + prefix + "." + String.format("%0" + ext.length() + "d", i))).exists()) {
+        String ext = FileHelper.getFileExtension(full);                            //001
+        String outputFilePath = FileHelper.removeFileExtension(full);	//C:\files\photo.png
+       
+        int i = 1;
+        File tmp;
+		while ((tmp = new File(outputFilePath + "." + String.format("%0" + ext.length() + "d", i))).exists()) {
 			this.totalBytes += tmp.length();
+			//System.out.println("reading file " + tmp.getName() + " of size " + tmp.length() + "B for a total of " +totalBytes+"B");
+			i++;
 		}
 	}
     
