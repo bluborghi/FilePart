@@ -22,6 +22,7 @@ import javax.swing.DefaultListModel;
 
 import java.awt.event.ActionListener;
 import java.awt.event.FocusListener;
+import java.awt.event.ItemListener;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.text.NumberFormat;
@@ -369,6 +370,10 @@ public class AppView extends JFrame {
 
 	public void setEnabledStartButton(boolean b) {
 		startButton.setEnabled(b);
+	}
+	
+	public void addSplitOptionsItemListener(ItemListener itemListener) {
+		splitOptions.addItemListener(itemListener);
 	}
 
 }

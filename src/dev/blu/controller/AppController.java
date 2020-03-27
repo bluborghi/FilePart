@@ -4,6 +4,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,19 +21,21 @@ import dev.blu.model.FileSplitterByMaxSize;
 import dev.blu.model.FileSplitterByPartNumber;
 import dev.blu.model.ProcessStatus;
 import dev.blu.model.SplitConfiguration;
+import dev.blu.model.SplitOption;
 import dev.blu.view.AppView;
 
 public class AppController {
 	private AppView view;
 
-	public AppController(AppView view) {
-		setView(view);
+	public AppController(AppView v) {
+		setView(v);
 
 		view.setAddButtonActionListener(new AddButtonActionListener());
 		view.setRemoveButtonActionListener(new RemoveButtonActionListener());
 		view.setStartButtonActionListener(new StartButtonActionListener());
 		view.setFileListSelectionListener(new FileListSelectionListener());
 		view.setFocusListener(new DetailsPanelFocusListener());
+		view.addSplitOptionsItemListener(new SplitOptionItemListener());
 	}
 
 	public AppView getView() {
@@ -135,6 +139,17 @@ public class AppController {
 				view.showStatus("");
 			}
 		}
+	}
+	
+	
+	class SplitOptionItemListener implements ItemListener{
+	    @Override
+	    public void itemStateChanged(ItemEvent event) {
+	       if (event.getStateChange() == ItemEvent.SELECTED) {
+	          SplitOption item = (SplitOption) event.getItem();
+	          System.out.println(item);
+	       }
+	    }
 	}
 
 	class DetailsPanelFocusListener implements FocusListener {
