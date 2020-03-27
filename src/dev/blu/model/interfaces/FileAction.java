@@ -1,4 +1,4 @@
-package dev.blu.model;
+package dev.blu.model.interfaces;
 
 public interface FileAction {
 	public void start();

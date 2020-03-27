@@ -1,10 +1,12 @@
-package dev.blu.model;
+package dev.blu.model.output;
 
 import java.io.File;
 import java.util.UUID;
 import java.util.Vector;
 
 import javax.swing.table.AbstractTableModel;
+
+import dev.blu.model.enums.ProcessStatus;
 
 public class FileTableModel extends AbstractTableModel {
 	private Vector<File> files;

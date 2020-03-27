@@ -1,11 +1,11 @@
-package dev.blu.model;
+package dev.blu.model.core;
 
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
-import static dev.blu.model.FileHelper.*;
+import static dev.blu.model.helpers.FileHelper.*;
 
 import java.io.*;
 import java.security.InvalidAlgorithmParameterException;

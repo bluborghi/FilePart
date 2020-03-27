@@ -41,11 +41,11 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.RowSpec;
 
-import dev.blu.model.FileTableModel;
-import dev.blu.model.ProcessStatus;
-import dev.blu.model.SplitConfiguration;
-import dev.blu.model.SplitOption;
-import dev.blu.model.ByteUnit;
+import dev.blu.model.core.SplitConfiguration;
+import dev.blu.model.enums.ByteUnit;
+import dev.blu.model.enums.ProcessStatus;
+import dev.blu.model.enums.SplitOption;
+import dev.blu.model.output.FileTableModel;
 
 import com.jgoodies.forms.layout.FormSpecs;
 import java.awt.GridLayout;

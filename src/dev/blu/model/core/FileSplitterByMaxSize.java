@@ -1,6 +1,10 @@
-package dev.blu.model;
+package dev.blu.model.core;
 
 import java.io.*;
+
+import dev.blu.model.helpers.FileHelper;
+import dev.blu.model.interfaces.FileAction;
+import dev.blu.model.interfaces.FileSplitter;
 
 public class FileSplitterByMaxSize implements FileSplitter, FileAction {
     protected File f;

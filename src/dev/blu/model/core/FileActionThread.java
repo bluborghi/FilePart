@@ -1,4 +1,6 @@
-package dev.blu.model;
+package dev.blu.model.core;
+
+import dev.blu.model.interfaces.FileAction;
 
 public class FileActionThread extends Thread {
 	FileAction fa;

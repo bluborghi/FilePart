@@ -1,7 +1,10 @@
-package dev.blu.model;
+package dev.blu.model.core;
 
 import java.io.File;
 import java.util.UUID;
+
+import dev.blu.model.enums.ByteUnit;
+import dev.blu.model.enums.SplitOption;
 
 public class SplitConfiguration {
 	private SplitOption splitOption;

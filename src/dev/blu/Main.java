@@ -4,7 +4,7 @@ package dev.blu;
 import javax.crypto.BadPaddingException;
 
 import dev.blu.controller.AppController;
-import dev.blu.model.FileCipher;
+import dev.blu.model.core.FileCipher;
 import dev.blu.view.AppView;
 
 import java.io.File;

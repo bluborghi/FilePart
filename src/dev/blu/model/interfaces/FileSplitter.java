@@ -1,4 +1,4 @@
-package dev.blu.model;
+package dev.blu.model.interfaces;
 
 import java.io.File;
 

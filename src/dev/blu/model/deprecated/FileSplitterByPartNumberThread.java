@@ -1,8 +1,11 @@
-package dev.blu.model;
+package dev.blu.model.deprecated;
 
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalTime;
+
+import dev.blu.model.core.FileSplitterByPartNumber;
+import dev.blu.model.interfaces.FileSplitter;
 
 import static java.time.temporal.ChronoUnit.MILLIS;
 

@@ -1,9 +1,12 @@
-package dev.blu.model;
+package dev.blu.model.core;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+
+import dev.blu.model.helpers.FileHelper;
+import dev.blu.model.interfaces.FileAction;
 
 public class FileMerger implements FileAction{
     protected File f;
