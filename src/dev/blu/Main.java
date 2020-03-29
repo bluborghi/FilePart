@@ -85,19 +85,22 @@ public class Main {
     	ids[1] = model.addFile(new File("/run/media/blubo/Volume/FilePart/prob.pdf"));
     	ids[2] = model.addFile(new File("/run/media/blubo/Volume/FilePart/war3.7z"));
     	
-    	model.updateConfig(ids[0], new SplitConfiguration(ids[2], SplitOption.SplitByMaxSize, 0, 800, ByteUnit.KiB, null, ""));
+    	model.updateConfig(ids[0], new SplitConfiguration(ids[2], SplitOption.SplitByMaxSize, 0, 800, ByteUnit.KiB, null, "/run/media/blubo/Volume/FilePart/myFolder/"));
     	model.updateConfig(ids[2], new SplitConfiguration(ids[2], SplitOption.SplitByMaxSize, 0, 100, ByteUnit.MiB, null, ""));
     	
-    	Vector<FileActionThread> threads = model.start();
+    	Vector<FileActionThread> threads = model.prepareThreads();
     	
     	for (FileActionThread t : threads) {
-
-    		System.out.println("waiting for "+t.getFile().getName());
-    		System.out.flush();
+    		if (t.hasErrors())
+    			System.err.print(t.getErrorMessage());
+    	}
+    	
+    	Vector<FileActionThread> startedThreads = model.startThreads(threads);
+    	
+    	for (FileActionThread t : startedThreads) {
     		t.join();
     	}
+    	
     	System.out.println("done");
-    	
-    	
     }
 }

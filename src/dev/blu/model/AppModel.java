@@ -2,6 +2,7 @@ package dev.blu.model;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.util.Set;
 import java.util.UUID;
 import java.util.Vector;
 
@@ -46,19 +47,11 @@ public class AppModel {
 	public void updateConfig(UUID id, SplitConfiguration splitConfig) {
 		tableModel.getConfig(id).setSplitConfig(splitConfig);
 	}
-
-	public Vector<FileActionThread> start(){
-		String err = "";
-		Vector<FileActionThread> threads = start(err);
-		if (!err.isEmpty())
-			System.err.println(err);
-		return threads;
-	}
 	
-	public Vector<FileActionThread> start(String err) {
-		Vector<FileActionThread> readyToStart = new Vector<FileActionThread>(0, 5);
-		
+	public Vector<FileActionThread> prepareThreads() {
+		Vector<FileActionThread> threads = new Vector<FileActionThread>(0, 5);
 		for (FileConfiguration conf : tableModel.getConfigs()) {
+			String err = "";
 			if (conf.getState() == ProcessStatus.Ready) {
 				SplitConfiguration sc = conf.getSplitConfig();
 				FileAction action = null;
@@ -69,29 +62,36 @@ public class AppModel {
 				case DoNothing:
 					break;
 				default:
-					err.concat(conf.getFile().getName() + " ignored: ").concat(System.lineSeparator());
-					err.concat(sc.getSplitOption().toString() + " not implemented yet").concat(System.lineSeparator());
+					err = err.concat(conf.getFile().getName() + " ignored: ").concat(System.lineSeparator());
+					err = err.concat(sc.getSplitOption().toString() + " not implemented yet").concat(System.lineSeparator());
 					break;
 				}
+				
 				if (action != null) {
 					String actionError = action.checkForErrors();
-					if (actionError == null)
-						readyToStart.add(new FileActionThread(action));
-					else {
-						err.concat(conf.getFile().getName() + " ignored: ").concat(System.lineSeparator());
-						err.concat(actionError).concat(System.lineSeparator());
+					if (actionError != null){
+						err = err.concat(conf.getFile().getName() + " ignored: ").concat(System.lineSeparator());
+						err = err.concat(actionError);
 					}
 				}
+				
+				threads.add(new FileActionThread(action,err));
+			}
+			
+			
+		}
+		
+		return threads;
+	}
+	
+	public Vector<FileActionThread> startThreads(Vector<FileActionThread> allThreads){
+		Vector<FileActionThread> startedThreads = new Vector<FileActionThread>(0,5);
+		for (FileActionThread t : allThreads) {
+			if (!t.hasErrors()) {
+				t.start();
+				startedThreads.add(t);				
 			}
 		}
-		
-		for (FileActionThread t : readyToStart) {
-			t.start();
-		}
-	
-		
-		if (readyToStart.isEmpty())
-			return null;
-		return readyToStart;
+		return startedThreads;
 	}
 }
