@@ -82,12 +82,13 @@ public class FileTableModel extends AbstractTableModel {
 		return 0;
 	}
 	
-	
-	
 	public FileConfiguration getConfig(int index) {
 		return configs.get(index);
 	}
-	
+
+	public FileConfiguration getConfig(UUID id) {
+		return getConfig(getIndex(id));
+	}
 	
 	public int getIndex(UUID id) {
 		int i = 0;
@@ -99,6 +100,11 @@ public class FileTableModel extends AbstractTableModel {
 		}
 		return -1;
 	}
+
+	public Vector<FileConfiguration> getConfigs() {
+		return configs;		
+	}
+
 	
 	
 	

@@ -4,13 +4,20 @@ package dev.blu;
 import javax.crypto.BadPaddingException;
 
 import dev.blu.controller.AppController;
+import dev.blu.model.AppModel;
+import dev.blu.model.core.FileActionThread;
 import dev.blu.model.core.FileCipher;
+import dev.blu.model.core.SplitConfiguration;
+import dev.blu.model.enums.ByteUnit;
+import dev.blu.model.enums.SplitOption;
 import dev.blu.view.AppView;
 
 import java.io.File;
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.time.LocalTime;
+import java.util.UUID;
+import java.util.Vector;
 import java.util.zip.CRC32;
 
 import static java.time.temporal.ChronoUnit.MILLIS;
@@ -66,8 +73,31 @@ public class Main {
 
     	
     	
-    	AppView view = new AppView();
-    	AppController controller = new AppController(view);
-    	view.setVisible(true); 
+    	//AppView view = new AppView();
+    	//AppController controller = new AppController(view);
+    	//view.setVisible(true);
+    	
+    	AppModel model = new AppModel();
+    	
+    	UUID[] ids = new UUID[3];
+    	
+    	ids[0] = model.addFile(new File("/run/media/blubo/Volume/FilePart/trial.jpg"));
+    	ids[1] = model.addFile(new File("/run/media/blubo/Volume/FilePart/prob.pdf"));
+    	ids[2] = model.addFile(new File("/run/media/blubo/Volume/FilePart/war3.7z"));
+    	
+    	model.updateConfig(ids[0], new SplitConfiguration(ids[2], SplitOption.SplitByMaxSize, 0, 800, ByteUnit.KiB, null, ""));
+    	model.updateConfig(ids[2], new SplitConfiguration(ids[2], SplitOption.SplitByMaxSize, 0, 100, ByteUnit.MiB, null, ""));
+    	
+    	Vector<FileActionThread> threads = model.start();
+    	
+    	for (FileActionThread t : threads) {
+
+    		System.out.println("waiting for "+t.getFile().getName());
+    		System.out.flush();
+    		t.join();
+    	}
+    	System.out.println("done");
+    	
+    	
     }
 }

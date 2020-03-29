@@ -2,6 +2,7 @@ package dev.blu.model.core;
 
 import java.io.*;
 
+import dev.blu.model.enums.SplitOption;
 import dev.blu.model.helpers.FileHelper;
 import dev.blu.model.interfaces.FileAction;
 import dev.blu.model.interfaces.FileSplitter;
@@ -12,18 +13,25 @@ public class FileSplitterByMaxSize implements FileSplitter, FileAction {
     protected int bufferLength;
     protected long[] bytesTransfered = new long[1];
 
-    public FileSplitterByMaxSize(File f, long maxSize, int bufferLength) {
+    private FileSplitterByMaxSize(File f, long maxSize, int bufferLength) {
         setFile(f);
         setMaxSize(maxSize);
         setBufferLength(bufferLength);
         bytesTransfered[0] = 0;
     }
 
-    public FileSplitterByMaxSize(File f, long maxSize) {
+    private FileSplitterByMaxSize(File f, long maxSize) {
         this(f,maxSize,1024*1024); //1MiB standard buffer
     }
+    
+    public FileSplitterByMaxSize(FileConfiguration config) {
+    	this(
+    		config.getFile(),
+    		config.getSplitConfig().getPartSize()*config.getSplitConfig().getUnit().getMultiplier()
+    	);
+    }
 
-    @Override
+	@Override
     public int split() {
         long parts = (f.length() + maxSize - 1) / maxSize;//formula to round up an integer division (positive only members)
         long file_length = f.length();
@@ -96,4 +104,27 @@ public class FileSplitterByMaxSize implements FileSplitter, FileAction {
 	public double getPercentage() {
 		return ((double) bytesTransfered[0]/(getFile().length())) * 100;
 	}
+
+	@Override
+	public String checkForErrors() {
+		String errors = "";
+		if (getFile() == null)
+			errors.concat("File not specified").concat(System.lineSeparator());
+		else if (!getFile().exists()) {
+			errors.concat("File not found").concat(System.lineSeparator());
+		}
+		if (getBufferLength()<0)
+			errors.concat("Invalid buffer length").concat(System.lineSeparator());
+		if (getMaxSize()<0)
+			errors.concat("Invalid part size length").concat(System.lineSeparator());
+		
+		if (errors.isEmpty()) return null;
+		else return errors;
+	}
+
+	@Override
+	public SplitOption getSplitOption() {
+		return SplitOption.SplitByMaxSize;
+	}
+	
 }
