@@ -5,6 +5,9 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import dev.blu.model.enums.SplitOption;
+import dev.blu.model.interfaces.FileAction;
+
 import static dev.blu.model.helpers.FileHelper.*;
 
 import java.io.*;
@@ -56,17 +59,21 @@ encrypt input file with key generated from user's password, hash the password an
  */
 
 
-public class FileCipher {
+public abstract class FileCipher {
     private static int DEFAULT_BUFFER_LENGTH = 4 * 1024 * 1024;
     private int bufferLength;
     private File f;
     private String outputDir;
 
-    public FileCipher(File f, String outputDir, int bufferLength) {
-        setFile(f);
-        setBufferLength(bufferLength);
+    protected FileCipher() {
+    	//don't use this
     }
-
+    
+    protected FileCipher(File f, String outputDir) {
+        setFile(f);
+        setBufferLength(DEFAULT_BUFFER_LENGTH);
+    }
+/*
     public FileCipher(File f, String outputDir) {
         this (f,outputDir,DEFAULT_BUFFER_LENGTH);
     }
@@ -74,7 +81,7 @@ public class FileCipher {
     public FileCipher(File f) {
         this(f, getParentDirectory(f.getAbsolutePath()), DEFAULT_BUFFER_LENGTH);
     }
-
+*/
     public String getOutputDir() {
         return outputDir;
     }

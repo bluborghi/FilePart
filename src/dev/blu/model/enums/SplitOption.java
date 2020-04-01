@@ -7,7 +7,8 @@ public enum SplitOption {
 	SplitAndEncrypt("Split and encrypt"),
 	Merge("Merge"),
 	MergeAndDecrypt("Merge and decrypt"),
-	DoNothing("Do nothing");
+	DoNothing("Do nothing"),
+	Encrypt("Encrypt");
 	
 	private String name;
 	
