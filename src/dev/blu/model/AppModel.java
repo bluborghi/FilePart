@@ -8,7 +8,9 @@ import java.util.Vector;
 
 import dev.blu.model.core.FileActionThread;
 import dev.blu.model.core.FileConfiguration;
+import dev.blu.model.core.FileMerger;
 import dev.blu.model.core.FileSplitterByMaxSize;
+import dev.blu.model.core.FileSplitterByPartNumber;
 import dev.blu.model.core.SplitConfiguration;
 import dev.blu.model.enums.ProcessStatus;
 import dev.blu.model.enums.SplitOption;
@@ -59,6 +61,12 @@ public class AppModel {
 				case SplitByMaxSize:
 					action = new FileSplitterByMaxSize(conf);
 					break;
+				case SplitByPartNumber:
+					action = new FileSplitterByPartNumber(conf);
+					break;
+				case Merge:
+					action = new FileMerger(conf);
+					break;
 				case DoNothing:
 					break;
 				default:
@@ -69,7 +77,7 @@ public class AppModel {
 				
 				if (action != null) {
 					String actionError = action.checkForErrors();
-					if (actionError != null){
+					if (actionError != null && !actionError.isEmpty()){
 						err = err.concat(conf.getFile().getName() + " ignored: ").concat(System.lineSeparator());
 						err = err.concat(actionError);
 					}

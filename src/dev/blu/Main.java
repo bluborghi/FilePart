@@ -81,12 +81,16 @@ public class Main {
     	
     	UUID[] ids = new UUID[3];
     	
-    	ids[0] = model.addFile(new File("/run/media/blubo/Volume/FilePart/trial.jpg"));
+    	ids[0] = model.addFile(new File("/run/media/blubo/Volume/FilePart/myFolder/trial.jpg"));
     	ids[1] = model.addFile(new File("/run/media/blubo/Volume/FilePart/prob.pdf"));
-    	ids[2] = model.addFile(new File("/run/media/blubo/Volume/FilePart/war3.7z"));
+    	ids[2] = model.addFile(new File("/run/media/blubo/Volume/FilePart/war3.7z.001"));
     	
-    	model.updateConfig(ids[0], new SplitConfiguration(ids[2], SplitOption.SplitByMaxSize, 0, 800, ByteUnit.KiB, null, "/run/media/blubo/Volume/FilePart/myFolder/"));
-    	model.updateConfig(ids[2], new SplitConfiguration(ids[2], SplitOption.SplitByMaxSize, 0, 100, ByteUnit.MiB, null, ""));
+    	model.updateConfig(ids[0], new SplitConfiguration(ids[2], SplitOption.SplitByMaxSize, 0, 800, ByteUnit.KiB, null, "/run/media/blubo/Volume/FilePart/myFolder"));
+    	model.updateConfig(ids[2], new SplitConfiguration(ids[2], SplitOption.Merge, 0, 100, ByteUnit.MiB, null, "/run/media/blubo/Volume/FilePart/myFolder/myOtherFolder"));
+    	
+    	model.updateConfig(ids[1], new SplitConfiguration(ids[1], SplitOption.SplitByPartNumber, 10, 0, ByteUnit.B, null, ""));
+    	//model.updateConfig(ids[2], new SplitConfiguration(ids[2], SplitOption.SplitByPartNumber, 10, 0, ByteUnit.B, null, ""));
+    	
     	
     	Vector<FileActionThread> threads = model.prepareThreads();
     	
@@ -97,8 +101,18 @@ public class Main {
     	
     	Vector<FileActionThread> startedThreads = model.startThreads(threads);
     	
-    	for (FileActionThread t : startedThreads) {
-    		t.join();
+    	
+    	boolean running = true;
+    	while (running) {
+    		running = false;
+    		for (FileActionThread t : startedThreads) {
+    			if (t.isAlive()) {
+    				running = true;
+    			}
+    			System.out.print(t.getFile().getName() + ": " + Math.floor(t.getPercentage()*10)/10 + " | ");
+    		}    		
+    		System.out.println();
+    		Thread.sleep(100); 
     	}
     	
     	System.out.println("done");

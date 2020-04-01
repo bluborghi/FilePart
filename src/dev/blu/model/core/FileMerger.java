@@ -4,29 +4,33 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.time.LocalTime;
 
+import dev.blu.model.enums.SplitOption;
 import dev.blu.model.helpers.FileHelper;
 import dev.blu.model.interfaces.FileAction;
+
+import static java.time.temporal.ChronoUnit.MILLIS;
 
 public class FileMerger implements FileAction{
     protected File f;
     protected int bufferLength;
     protected long[] bytesTransfered = new long[1];
 	private long totalBytes;
-
-    public FileMerger(File f, int bufferLength) {
-        setFile(f);
-        setBufferLength(bufferLength);
+	private String outputDir;
+	
+    public FileMerger(FileConfiguration config) {
+    	setFile(config.getFile());
+        setBufferLength(0);//use default
+        setOutputDir(config.getSplitConfig().getOutputDir());
+        
         bytesTransfered[0] = 0;
         totalBytes = 0;
     }
-
-    public FileMerger(File f){
-        this(f,0); //use default
-    }
+    
 
     public int merge() throws IOException {
-    	calcTotalBytes();
+    	if (getTotalBytes() == 0) calcTotalBytes();
         /*String abs = getFile().getAbsolutePath();                                           //C:\files\photo.png
         File starter = null;
         int MAX_LENGTH = String.valueOf(Integer.MAX_VALUE).length();
@@ -42,18 +46,19 @@ public class FileMerger implements FileAction{
 
         String full = starter.getAbsolutePath();                        //C:\files\photo.png.001
         String ext = FileHelper.getFileExtension(full);                            //001
-        String outputFilePath = FileHelper.removeFileExtension(full);	//C:\files\photo.png
+        String commonPath = FileHelper.removeFileExtension(full);	//C:\files\photo.png
 
         // String name = starter.getName();                                //photo.png.001
        //String prefix = FileHelper.removeFileExtension(name);                      //photo.png
        // String parent = FileHelper.getParentDirectory(full) + File.pathSeparator; //C:\files\
-        
-        File output = new File(outputFilePath);          //C:\files\photo.png
+       
+        System.out.println(getOutputDir()+File.separator+FileHelper.removeFileExtension(starter.getName()));
+        File output = new File(getOutputDir()+File.separator+FileHelper.removeFileExtension(starter.getName())); // outputDir\photo.png
         output.createNewFile();
         FileOutputStream fos = new FileOutputStream(output);
         File tmp;
         int i = 1;
-        while ((tmp = new File(outputFilePath + "." + String.format("%0" + ext.length() + "d", i))).exists()) { //C:\files\photo.png.i
+        while ((tmp = new File(commonPath + "." + String.format("%0" + ext.length() + "d", i))).exists()) { //C:\files\photo.png.i
             FileInputStream fis = new FileInputStream(tmp);
 
             if (getBufferLength()==0) //if bufferLength is set to default (0)
@@ -86,6 +91,16 @@ public class FileMerger implements FileAction{
         else
             this.bufferLength = bufferLength;
     }
+    
+	public String getOutputDir() {
+		return outputDir;
+	}
+
+	public void setOutputDir(String outputDir) {
+		if (outputDir.isEmpty())
+			this.outputDir = getFile().getParent();
+		this.outputDir = outputDir;
+	}
 
 	@Override
 	public void start() {
@@ -116,15 +131,35 @@ public class FileMerger implements FileAction{
         
         String full = starter.getAbsolutePath();                        //C:\files\photo.png.001
         String ext = FileHelper.getFileExtension(full);                            //001
-        String outputFilePath = FileHelper.removeFileExtension(full);	//C:\files\photo.png
+        String commonPath = FileHelper.removeFileExtension(full);	//C:\files\photo.png
        
         int i = 1;
         File tmp;
-		while ((tmp = new File(outputFilePath + "." + String.format("%0" + ext.length() + "d", i))).exists()) {
+		while ((tmp = new File(commonPath + "." + String.format("%0" + ext.length() + "d", i))).exists()) {//this means commonPath.00i        
 			this.totalBytes += tmp.length();
 			//System.out.println("reading file " + tmp.getName() + " of size " + tmp.length() + "B for a total of " +totalBytes+"B");
 			i++;
 		}
+	}
+
+	@Override
+	public String checkForErrors() {
+		String errors = "";
+		if (getFile() == null || !getFile().exists() || getFile().isDirectory())
+			errors = errors.concat("File not found or invalid").concat(System.lineSeparator());
+		File outputDir = new File(getOutputDir());
+		if (outputDir == null || !outputDir.exists() || !outputDir.isDirectory())
+			errors = errors.concat("Output directory not found or invalid").concat(System.lineSeparator());
+		calcTotalBytes();
+		if (getTotalBytes() <= 0)
+			errors = errors.concat("Error reading input files").concat(System.lineSeparator());
+		
+		return errors;
+	}
+
+	@Override
+	public SplitOption getSplitOption() {
+		return SplitOption.Merge;
 	}
     
     

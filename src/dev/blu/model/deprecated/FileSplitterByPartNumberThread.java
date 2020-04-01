@@ -9,8 +9,8 @@ import dev.blu.model.interfaces.FileSplitter;
 
 import static java.time.temporal.ChronoUnit.MILLIS;
 
-public class FileSplitterByPartNumberThread extends Thread {
-    private String fileDir;
+public class FileSplitterByPartNumberThread { //extends Thread {
+  /*  private String fileDir;
     private File f;
     private long parts;
 
@@ -57,4 +57,5 @@ public class FileSplitterByPartNumberThread extends Thread {
     public void setFile(File f) {
         this.f = f;
     }
+    */
 }
