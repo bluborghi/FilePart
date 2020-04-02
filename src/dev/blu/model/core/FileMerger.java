@@ -147,7 +147,8 @@ public class FileMerger implements FileAction{
 		String errors = "";
 		if (getFile() == null || !getFile().exists() || getFile().isDirectory())
 			errors = errors.concat("File not found or invalid").concat(System.lineSeparator());
-		File outputDir = new File(getOutputDir());
+		File outputDir = null;
+		if (getOutputDir() != null) outputDir = new File(getOutputDir());
 		if (outputDir == null || !outputDir.exists() || !outputDir.isDirectory())
 			errors = errors.concat("Output directory not found or invalid").concat(System.lineSeparator());
 		calcTotalBytes();

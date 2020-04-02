@@ -8,6 +8,8 @@ import java.util.Vector;
 
 import dev.blu.model.core.FileActionThread;
 import dev.blu.model.core.FileConfiguration;
+import dev.blu.model.core.FileDecryptor;
+import dev.blu.model.core.FileEncryptor;
 import dev.blu.model.core.FileMerger;
 import dev.blu.model.core.FileSplitterByMaxSize;
 import dev.blu.model.core.FileSplitterByPartNumber;
@@ -66,6 +68,12 @@ public class AppModel {
 					break;
 				case Merge:
 					action = new FileMerger(conf);
+					break;
+				case Encrypt:
+					action = new FileEncryptor(conf);
+					break;
+				case Decrypt:
+					action = new FileDecryptor(conf);
 					break;
 				case DoNothing:
 					break;

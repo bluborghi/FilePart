@@ -12,13 +12,14 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
 import dev.blu.model.enums.SplitOption;
+import dev.blu.model.helpers.FileHelper;
 import dev.blu.model.interfaces.FileAction;
 
-public class FileEncryptor extends FileCipher implements FileAction {
+public class FileDecryptor extends FileCipher implements FileAction {
 	private static final int MIN_PW_LENGTH = 8;
 	private char[] password;
 	
-	public FileEncryptor(FileConfiguration config) {
+	public FileDecryptor(FileConfiguration config) {
 		super(
 				config.getFile(),
 				config.getSplitConfig().getOutputDir()
@@ -29,7 +30,7 @@ public class FileEncryptor extends FileCipher implements FileAction {
 	@Override
 	public void start() {
 		try {
-			super.Encrypt(password);
+			super.Decrypt(password);
 		} catch (InvalidKeyException | NoSuchAlgorithmException | InvalidKeySpecException | NoSuchPaddingException
 				| InvalidAlgorithmParameterException | BadPaddingException | IllegalBlockSizeException
 				| IOException e) {
@@ -46,22 +47,20 @@ public class FileEncryptor extends FileCipher implements FileAction {
 	@Override
 	public String checkForErrors() {
 		String errors = "";
-		if (getFile() == null || !getFile().exists() || getFile().isDirectory())
+		if (getFile() == null || !getFile().exists() || getFile().isDirectory() || !FileHelper.getFileExtension((getFile().getName())).equals("crypt") )
 			errors = errors.concat("File not found or invalid").concat(System.lineSeparator());
 		File outputDir = new File(getOutputDir());
 		if (outputDir == null || !outputDir.exists() || !outputDir.isDirectory())
 			errors = errors.concat("Output directory not found or invalid").concat(System.lineSeparator());
-		if (password == null || password.toString() == null || password.length == 0)
+		if (password == null || password.length == 0)
 			errors = errors.concat("Missing password").concat(System.lineSeparator());
-		else if (password.length < MIN_PW_LENGTH)
-			errors = errors.concat("Password too short, minimum password length: "+ MIN_PW_LENGTH).concat(System.lineSeparator());
 		
 		return errors;
 	}
 
 	@Override
 	public SplitOption getSplitOption() {
-		return SplitOption.Encrypt;
+		return SplitOption.Decrypt;
 	}
 	
 }
