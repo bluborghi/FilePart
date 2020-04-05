@@ -14,7 +14,14 @@ public class FileSplitterByPartNumber extends FileSplitterByMaxSize {
         setMaxSize(size);
     }
 
-    public long getParts() {
+    public FileSplitterByPartNumber(File inputFile, SplitConfiguration params) {
+    	super(inputFile,params);
+    	setParts(params.getPartNumber());
+        long size = calcMaxSize();
+        setMaxSize(size);
+	}
+
+	public long getParts() {
         return parts;
     }
 
@@ -45,8 +52,7 @@ public class FileSplitterByPartNumber extends FileSplitterByMaxSize {
 			errors = errors.concat("Invalid destination path").concat(System.lineSeparator());
 		}
 	
-		if (errors.isEmpty()) return null;
-		else return errors;
+		return errors;
 	}
     
     @Override

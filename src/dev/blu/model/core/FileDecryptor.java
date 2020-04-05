@@ -27,6 +27,14 @@ public class FileDecryptor extends FileCipher implements FileAction {
 		password = config.getSplitConfig().getPw();
 	}
 	
+	public FileDecryptor(File inputFile, SplitConfiguration params) {
+		super(
+				inputFile,
+				params.getOutputDir()
+			);
+		password = params.getPw();
+	}
+
 	@Override
 	public void start() {
 		try {
@@ -61,6 +69,11 @@ public class FileDecryptor extends FileCipher implements FileAction {
 	@Override
 	public SplitOption getSplitOption() {
 		return SplitOption.Decrypt;
+	}
+
+	@Override
+	public File getOutputFile() {
+		return new File(FileHelper.removeFileExtension(getFile().getAbsolutePath()));// file.txt.crypt => file.txt
 	}
 	
 }

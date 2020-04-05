@@ -9,6 +9,7 @@ public interface FileAction {
 	public double getPercentage();
 	public String checkForErrors();
 	public File getFile();
+	public File getOutputFile();
 	public SplitOption getSplitOption();
 
 }

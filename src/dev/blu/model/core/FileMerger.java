@@ -29,7 +29,17 @@ public class FileMerger implements FileAction{
     }
     
 
-    public int merge() throws IOException {
+    public FileMerger(File inputFile, SplitConfiguration params) {
+    	setFile(inputFile);
+        setBufferLength(0);//use default
+        setOutputDir(params.getOutputDir());
+        
+        bytesTransfered[0] = 0;
+        totalBytes = 0;
+	}
+
+
+	public int merge() throws IOException {
     	if (getTotalBytes() == 0) calcTotalBytes();
         /*String abs = getFile().getAbsolutePath();                                           //C:\files\photo.png
         File starter = null;
@@ -161,6 +171,12 @@ public class FileMerger implements FileAction{
 	@Override
 	public SplitOption getSplitOption() {
 		return SplitOption.Merge;
+	}
+
+
+	@Override
+	public File getOutputFile() {
+		return new File(getOutputDir()+File.separator+FileHelper.removeFileExtension(getFile().getName()));   
 	}
     
     

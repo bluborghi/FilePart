@@ -9,7 +9,9 @@ import java.util.Vector;
 import dev.blu.model.core.FileActionThread;
 import dev.blu.model.core.FileConfiguration;
 import dev.blu.model.core.FileDecryptor;
+import dev.blu.model.core.FileEncryptAndSplit;
 import dev.blu.model.core.FileEncryptor;
+import dev.blu.model.core.FileMergeAndDecrypt;
 import dev.blu.model.core.FileMerger;
 import dev.blu.model.core.FileSplitterByMaxSize;
 import dev.blu.model.core.FileSplitterByPartNumber;
@@ -59,6 +61,13 @@ public class AppModel {
 			if (conf.getState() == ProcessStatus.Ready) {
 				SplitConfiguration sc = conf.getSplitConfig();
 				FileAction action = null;
+				
+				//action = new FileEncryptAndSplit(conf.getFile(),sc);
+				
+				action = new FileMergeAndDecrypt(conf.getFile(),sc);
+				
+				
+				/*
 				switch (sc.getSplitOption()) {
 				case SplitByMaxSize:
 					action = new FileSplitterByMaxSize(conf);
@@ -82,6 +91,7 @@ public class AppModel {
 					err = err.concat(sc.getSplitOption().toString() + " not implemented yet").concat(System.lineSeparator());
 					break;
 				}
+				*/
 				
 				if (action != null) {
 					String actionError = action.checkForErrors();
