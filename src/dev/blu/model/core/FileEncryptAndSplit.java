@@ -25,6 +25,10 @@ public class FileEncryptAndSplit implements FileAction {
 			split = new FileSplitterByPartNumber(encrypt.getOutputFile(),params);
 	}
 	
+	public FileEncryptAndSplit(FileConfiguration conf) {
+		this(conf.getFile(), conf.getSplitConfig());
+	}
+
 	@Override
 	public void start() {
 		encrypt.start();
@@ -33,7 +37,9 @@ public class FileEncryptAndSplit implements FileAction {
 
 	@Override
 	public double getPercentage() {
-		return (encrypt.getPercentage() + split.getPercentage())/2;
+		double first = encrypt.getPercentage();
+		double second =  split.getPercentage();
+		return (first + second)/2;
 	}
 
 	@Override

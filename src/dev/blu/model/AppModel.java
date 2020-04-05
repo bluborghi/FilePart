@@ -59,39 +59,27 @@ public class AppModel {
 		for (FileConfiguration conf : tableModel.getConfigs()) {
 			String err = "";
 			if (conf.getState() == ProcessStatus.Ready) {
-				SplitConfiguration sc = conf.getSplitConfig();
+				SplitConfiguration params = conf.getSplitConfig();
 				FileAction action = null;
 				
-				//action = new FileEncryptAndSplit(conf.getFile(),sc);
-				
-				action = new FileMergeAndDecrypt(conf.getFile(),sc);
-				
-				
-				/*
-				switch (sc.getSplitOption()) {
-				case SplitByMaxSize:
-					action = new FileSplitterByMaxSize(conf);
-					break;
-				case SplitByPartNumber:
-					action = new FileSplitterByPartNumber(conf);
-					break;
-				case Merge:
-					action = new FileMerger(conf);
-					break;
-				case Encrypt:
-					action = new FileEncryptor(conf);
-					break;
-				case Decrypt:
-					action = new FileDecryptor(conf);
-					break;
-				case DoNothing:
-					break;
-				default:
+				if (params == null) {
 					err = err.concat(conf.getFile().getName() + " ignored: ").concat(System.lineSeparator());
-					err = err.concat(sc.getSplitOption().toString() + " not implemented yet").concat(System.lineSeparator());
-					break;
+					err = err.concat("No configuration given").concat(System.lineSeparator());
 				}
-				*/
+				else if (params.getPw() != null && params.getPw().length>0) {
+					if (params.getPartSize()>0 || params.getPartNumber()>0)
+						action = new FileEncryptAndSplit(conf);
+					else // no split params => merge
+						action = new FileMergeAndDecrypt(conf);
+				}
+				else { //no password => no encryption
+					if (params.getPartSize()>0)
+						action = new FileSplitterByMaxSize(conf);
+					if (params.getPartNumber()>0)
+						action = new FileSplitterByPartNumber(conf);
+					else // no split params => merge
+						action = new FileMerger(conf);
+				}
 				
 				if (action != null) {
 					String actionError = action.checkForErrors();

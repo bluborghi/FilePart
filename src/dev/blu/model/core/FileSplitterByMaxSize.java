@@ -46,7 +46,8 @@ public class FileSplitterByMaxSize implements FileSplitter, FileAction {
 
 	@Override
 	public int split() {
-		if (maxSize<=0) return -1;
+		if (maxSize <= 0)
+			return -1;
 		long parts = (f.length() + maxSize - 1) / maxSize;// formula to round up an integer division (positive only
 															// members)
 		long file_length = f.length();
@@ -121,7 +122,9 @@ public class FileSplitterByMaxSize implements FileSplitter, FileAction {
 
 	@Override
 	public double getPercentage() {
-		return ((double) bytesTransfered[0] / (getFile().length())) * 100;
+		double result = ((double) bytesTransfered[0] / (getFile().length())) * 100;
+		if (Double.isNaN(result)) return 0;
+		return result;
 	}
 
 	@Override

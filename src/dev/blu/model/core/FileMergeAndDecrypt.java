@@ -22,6 +22,10 @@ public class FileMergeAndDecrypt implements FileAction {
 		decrypt = new FileDecryptor(merge.getOutputFile(), params);
 	}
 	
+	public FileMergeAndDecrypt(FileConfiguration conf) {
+		this(conf.getFile(),conf.getSplitConfig());
+	}
+
 	@Override
 	public void start() {
 		merge.start();

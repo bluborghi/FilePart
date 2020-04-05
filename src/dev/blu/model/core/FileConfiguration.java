@@ -27,7 +27,7 @@ public class FileConfiguration {
 		this.id = id;
 		this.state = ProcessStatus.Ready;
 		this.percentage = 0;
-		this.splitConfig = new SplitConfiguration(id);
+		this.splitConfig = null;
 	}
 
 	public FileConfiguration(File file) {
