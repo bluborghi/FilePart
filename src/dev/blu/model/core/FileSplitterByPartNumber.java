@@ -2,8 +2,6 @@ package dev.blu.model.core;
 
 import java.io.File;
 
-import dev.blu.model.enums.SplitOption;
-
 public class FileSplitterByPartNumber extends FileSplitterByMaxSize {
     private long parts;
 
@@ -30,7 +28,7 @@ public class FileSplitterByPartNumber extends FileSplitterByMaxSize {
     }
 
     protected long calcMaxSize(){
-        long file_length = getFile().length();
+        long file_length = getInputFile().length();
         if (parts <= 0)
         	return 0;
         return (file_length+parts-1)/parts;//formula to round up an integer division (positive only members)
@@ -39,9 +37,9 @@ public class FileSplitterByPartNumber extends FileSplitterByMaxSize {
     @Override
 	public String checkForErrors() {
 		String errors = "";
-		if (getFile() == null)
+		if (getInputFile() == null)
 			errors = errors.concat("File not specified").concat(System.lineSeparator());
-		else if (!getFile().exists()) {
+		else if (!getInputFile().exists()) {
 			errors = errors.concat("File not found").concat(System.lineSeparator());
 		}
 		if (getBufferLength()<= 0)
@@ -53,10 +51,5 @@ public class FileSplitterByPartNumber extends FileSplitterByMaxSize {
 		}
 	
 		return errors;
-	}
-    
-    @Override
-	public SplitOption getSplitOption() {
-		return SplitOption.SplitByPartNumber;
 	}
 }

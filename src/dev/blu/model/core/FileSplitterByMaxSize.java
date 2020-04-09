@@ -2,7 +2,6 @@ package dev.blu.model.core;
 
 import java.io.*;
 
-import dev.blu.model.enums.SplitOption;
 import dev.blu.model.helpers.FileHelper;
 import dev.blu.model.interfaces.FileAction;
 import dev.blu.model.interfaces.FileSplitter;
@@ -87,7 +86,7 @@ public class FileSplitterByMaxSize implements FileSplitter, FileAction {
 		return 0;
 	}
 
-	public File getFile() {
+	public File getInputFile() {
 		return f;
 	}
 
@@ -122,7 +121,7 @@ public class FileSplitterByMaxSize implements FileSplitter, FileAction {
 
 	@Override
 	public double getPercentage() {
-		double result = ((double) bytesTransfered[0] / (getFile().length())) * 100;
+		double result = ((double) bytesTransfered[0] / (getInputFile().length())) * 100;
 		if (Double.isNaN(result)) return 0;
 		return result;
 	}
@@ -130,9 +129,9 @@ public class FileSplitterByMaxSize implements FileSplitter, FileAction {
 	@Override
 	public String checkForErrors() {
 		String errors = "";
-		if (getFile() == null)
+		if (getInputFile() == null)
 			errors = errors.concat("File not specified").concat(System.lineSeparator());
-		else if (!getFile().exists()) {
+		else if (!getInputFile().exists()) {
 			errors = errors.concat("File not found").concat(System.lineSeparator());
 		}
 		if (getBufferLength() <= 0)
@@ -144,11 +143,6 @@ public class FileSplitterByMaxSize implements FileSplitter, FileAction {
 		}
 
 		return errors;
-	}
-
-	@Override
-	public SplitOption getSplitOption() {
-		return SplitOption.SplitByMaxSize;
 	}
 
 	@Override

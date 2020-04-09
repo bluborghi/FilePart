@@ -27,7 +27,7 @@ public class FileActionThread extends Thread {
 	}
 	
 	public File getFile() {
-		return fa.getFile();
+		return fa.getInputFile();
 	}
 	
 	public String getErrorMessage() {

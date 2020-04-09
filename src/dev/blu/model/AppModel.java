@@ -17,7 +17,6 @@ import dev.blu.model.core.FileSplitterByMaxSize;
 import dev.blu.model.core.FileSplitterByPartNumber;
 import dev.blu.model.core.SplitConfiguration;
 import dev.blu.model.enums.ProcessStatus;
-import dev.blu.model.enums.SplitOption;
 import dev.blu.model.interfaces.FileAction;
 import dev.blu.model.output.FileTableModel;
 

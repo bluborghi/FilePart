@@ -9,7 +9,6 @@ import dev.blu.model.core.FileActionThread;
 import dev.blu.model.core.FileCipher;
 import dev.blu.model.core.SplitConfiguration;
 import dev.blu.model.enums.ByteUnit;
-import dev.blu.model.enums.SplitOption;
 import dev.blu.view.AppView;
 
 import java.io.File;
@@ -88,7 +87,7 @@ public class Main {
 //    	ids[4] = model.addFile(new File("/run/media/blubo/Volume/FilePart/myFolder/myOtherFolder/war3.7z.crypt"));
 //    	
 //    	model.updateConfig(ids[0], new SplitConfiguration(ids[0], SplitOption.DoNothing, 0, 0, ByteUnit.B, "freccettapun".toCharArray(), "/run/media/blubo/Volume/FilePart/myFolder"));
-     	model.updateConfig(ids[1], new SplitConfiguration(ids[1], SplitOption.DoNothing, 3, 0, ByteUnit.B, "caccamelone".toCharArray(), "/run/media/blubo/Volume/FilePart/myFolder/mySecondOtherFolder"));
+     	model.updateConfig(ids[1], new SplitConfiguration(ids[1], 3, 0, ByteUnit.B, "caccamelone".toCharArray(), "/run/media/blubo/Volume/FilePart/myFolder/mySecondOtherFolder"));
     	
 //    	model.updateConfig(ids[1], new SplitConfiguration(ids[1], SplitOption.SplitByPartNumber, 10, 0, ByteUnit.B, null, ""));
 //    	model.updateConfig(ids[2], new SplitConfiguration(ids[2], SplitOption.SplitByPartNumber, 10, 0, ByteUnit.B, null, ""));

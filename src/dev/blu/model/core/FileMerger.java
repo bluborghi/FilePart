@@ -6,7 +6,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalTime;
 
-import dev.blu.model.enums.SplitOption;
 import dev.blu.model.helpers.FileHelper;
 import dev.blu.model.interfaces.FileAction;
 
@@ -51,7 +50,7 @@ public class FileMerger implements FileAction{
                 break;
             }
         }*/
-    	File starter = getFile();
+    	File starter = getInputFile();
         if (starter == null) return -1;
 
         String full = starter.getAbsolutePath();                        //C:\files\photo.png.001
@@ -83,7 +82,7 @@ public class FileMerger implements FileAction{
         return 0;
     }
 
-    public File getFile() {
+    public File getInputFile() {
         return f;
     }
 
@@ -108,7 +107,7 @@ public class FileMerger implements FileAction{
 
 	public void setOutputDir(String outputDir) {
 		if (outputDir.isEmpty())
-			this.outputDir = getFile().getParent();
+			this.outputDir = getInputFile().getParent();
 		this.outputDir = outputDir;
 	}
 
@@ -136,7 +135,7 @@ public class FileMerger implements FileAction{
 
 	private void calcTotalBytes() {
 		totalBytes = 0;
-		File starter = getFile();
+		File starter = getInputFile();
         if (starter == null) return;
         
         String full = starter.getAbsolutePath();                        //C:\files\photo.png.001
@@ -155,7 +154,7 @@ public class FileMerger implements FileAction{
 	@Override
 	public String checkForErrors() {
 		String errors = "";
-		if (getFile() == null || !getFile().exists() || getFile().isDirectory())
+		if (getInputFile() == null || !getInputFile().exists() || getInputFile().isDirectory())
 			errors = errors.concat("File not found or invalid").concat(System.lineSeparator());
 		File outputDir = null;
 		if (getOutputDir() != null) outputDir = new File(getOutputDir());
@@ -169,14 +168,8 @@ public class FileMerger implements FileAction{
 	}
 
 	@Override
-	public SplitOption getSplitOption() {
-		return SplitOption.Merge;
-	}
-
-
-	@Override
 	public File getOutputFile() {
-		return new File(getOutputDir()+File.separator+FileHelper.removeFileExtension(getFile().getName()));   
+		return new File(getOutputDir()+File.separator+FileHelper.removeFileExtension(getInputFile().getName()));   
 	}
     
     

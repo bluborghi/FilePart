@@ -3,7 +3,6 @@ package dev.blu.model.core;
 import java.io.File;
 import java.io.IOException;
 
-import dev.blu.model.enums.SplitOption;
 import dev.blu.model.interfaces.FileAction;
 
 public class FileMergeAndDecrypt implements FileAction {
@@ -46,14 +45,8 @@ public class FileMergeAndDecrypt implements FileAction {
 	}
 
 	@Override
-	public File getFile() {
+	public File getInputFile() {
 		return inputFile;
-	}
-
-	@Override
-	public SplitOption getSplitOption() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override

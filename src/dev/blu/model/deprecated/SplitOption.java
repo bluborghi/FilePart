@@ -1,4 +1,4 @@
-package dev.blu.model.enums;
+package dev.blu.model.deprecated;
 
 
 public enum SplitOption {

@@ -11,7 +11,6 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
-import dev.blu.model.enums.SplitOption;
 import dev.blu.model.helpers.FileHelper;
 import dev.blu.model.interfaces.FileAction;
 
@@ -55,7 +54,7 @@ public class FileDecryptor extends FileCipher implements FileAction {
 	@Override
 	public String checkForErrors() {
 		String errors = "";
-		if (getFile() == null || !getFile().exists() || getFile().isDirectory() || !FileHelper.getFileExtension((getFile().getName())).equals("crypt") )
+		if (getInputFile() == null || !getInputFile().exists() || getInputFile().isDirectory() || !FileHelper.getFileExtension((getInputFile().getName())).equals("crypt") )
 			errors = errors.concat("File not found or invalid").concat(System.lineSeparator());
 		File outputDir = new File(getOutputDir());
 		if (outputDir == null || !outputDir.exists() || !outputDir.isDirectory())
@@ -67,13 +66,8 @@ public class FileDecryptor extends FileCipher implements FileAction {
 	}
 
 	@Override
-	public SplitOption getSplitOption() {
-		return SplitOption.Decrypt;
-	}
-
-	@Override
 	public File getOutputFile() {
-		return new File(FileHelper.removeFileExtension(getFile().getAbsolutePath()));// file.txt.crypt => file.txt
+		return new File(FileHelper.removeFileExtension(getInputFile().getAbsolutePath()));// file.txt.crypt => file.txt
 	}
 	
 }

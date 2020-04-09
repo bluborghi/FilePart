@@ -5,7 +5,6 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
-import dev.blu.model.enums.SplitOption;
 import dev.blu.model.interfaces.FileAction;
 
 import static dev.blu.model.helpers.FileHelper.*;
@@ -89,8 +88,8 @@ public abstract class FileCipher {
     }
 
     public void setOutputDir(String outputDir) {
-    	if ((outputDir == null || outputDir.isEmpty()) && getFile() != null )
-    		this.outputDir = getFile().getParent();
+    	if ((outputDir == null || outputDir.isEmpty()) && getInputFile() != null )
+    		this.outputDir = getInputFile().getParent();
     	else 
     		this.outputDir = outputDir;
     }
@@ -103,7 +102,7 @@ public abstract class FileCipher {
         this.bufferLength = bufferLength;
     }
 
-    public File getFile() {
+    public File getInputFile() {
         return f;
     }
 
@@ -134,7 +133,7 @@ public abstract class FileCipher {
         IvParameterSpec ivspec = new IvParameterSpec(iv);
 
         //getOutputDir()+File.separator+fileName
-        String fileName = getFile().getName() + ".crypt";
+        String fileName = getInputFile().getName() + ".crypt";
         File output = new File(getOutputDir()+File.separator+fileName);
         FileOutputStream out = new FileOutputStream(output);
         out.write(salt);
@@ -143,7 +142,7 @@ public abstract class FileCipher {
         Cipher ci = Cipher.getInstance("AES/CBC/PKCS5Padding");
         ci.init(Cipher.ENCRYPT_MODE, skey, ivspec);
 
-        FileInputStream in = new FileInputStream(getFile());
+        FileInputStream in = new FileInputStream(getInputFile());
         //System.out.println("input file length: "+getFile().length());
         //System.out.println("initial output file length: "+output.length());
         processFile(ci, in, out);
@@ -154,7 +153,7 @@ public abstract class FileCipher {
     }
 
     public File Decrypt(char[] password) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, NoSuchPaddingException, InvalidAlgorithmParameterException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
-        FileInputStream in = new FileInputStream(getFile());
+        FileInputStream in = new FileInputStream(getInputFile());
         byte[] salt = new byte[8], iv = new byte[128/8];
         in.read(salt);
         in.read(iv);
@@ -167,7 +166,7 @@ public abstract class FileCipher {
         Cipher ci = Cipher.getInstance("AES/CBC/PKCS5Padding");
         ci.init(Cipher.DECRYPT_MODE, skey, new IvParameterSpec(iv));
 
-        String fileName = removeFileExtension(getFile().getName());
+        String fileName = removeFileExtension(getInputFile().getName());
         File output = new File(getOutputDir()+File.separator+fileName);
         FileOutputStream out = new FileOutputStream(output);
         processFile(ci, in, out);
@@ -182,7 +181,7 @@ public abstract class FileCipher {
         int len;
         //System.out.println(ci.getOutputSize(getBufferLength()));
         //System.out.println(getBufferLength());
-        long totalBytes = getFile().length();
+        long totalBytes = getInputFile().length();
         long bytesRead = 0;
         while ((len = in.read(ibuf)) != -1) {
         	bytesRead += len;
