@@ -172,7 +172,10 @@ public class FileMerger implements FileAction{
 		return new File(getOutputDir()+File.separator+FileHelper.removeFileExtension(getInputFile().getName()));   
 	}
     
-    
+	@Override
+	public void clear() {
+		//nothing to clear
+	}
     
 }
 

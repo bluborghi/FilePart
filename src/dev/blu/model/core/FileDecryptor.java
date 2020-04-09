@@ -70,4 +70,8 @@ public class FileDecryptor extends FileCipher implements FileAction {
 		return new File(FileHelper.removeFileExtension(getInputFile().getAbsolutePath()));// file.txt.crypt => file.txt
 	}
 	
+	@Override
+	public void clear() {
+		//nothing to clear
+	}
 }

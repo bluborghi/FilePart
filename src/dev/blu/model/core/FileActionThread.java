@@ -20,6 +20,7 @@ public class FileActionThread extends Thread {
 	@Override
 	public void run() {
 		fa.start();
+		fa.clear();
 	}
 	
 	public double getPercentage() {

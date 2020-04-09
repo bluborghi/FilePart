@@ -45,8 +45,15 @@ public class FileSplitterByMaxSize implements FileSplitter, FileAction {
 
 	@Override
 	public int split() {
-		if (maxSize <= 0)
-			return -1;
+		if (maxSize <= 0) {
+			if (this instanceof FileSplitterByPartNumber) {
+				FileSplitterByPartNumber splitter = (FileSplitterByPartNumber) this;
+				maxSize = splitter.calcMaxSize();
+			}
+			else {
+				return -1;	
+			}
+		}
 		long parts = (f.length() + maxSize - 1) / maxSize;// formula to round up an integer division (positive only
 															// members)
 		long file_length = f.length();
@@ -99,6 +106,8 @@ public class FileSplitterByMaxSize implements FileSplitter, FileAction {
 	}
 
 	protected void setMaxSize(long maxSize) {
+		if (this.maxSize > 0 && maxSize == 0)
+			return;
 		this.maxSize = maxSize;
 	}
 
@@ -155,6 +164,11 @@ public class FileSplitterByMaxSize implements FileSplitter, FileAction {
 			extension_length = 3;
 		return new File(destinationDirectory.getAbsolutePath() + File.separator + f.getName() + "."
 				+ String.format("%0" + extension_length + "d", 1));
+	}
+
+	@Override
+	public void clear() {
+		//nothing to clear
 	}
 
 }

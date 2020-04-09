@@ -6,9 +6,10 @@ import java.io.IOException;
 import dev.blu.model.interfaces.FileAction;
 
 public class FileEncryptAndSplit implements FileAction {
-	FileAction encrypt;
-	FileAction split;
-	File inputFile;
+	private FileAction encrypt;
+	private FileAction split;
+	private File inputFile;
+	private File toDelete;
 	
 	public FileEncryptAndSplit(File inputFile, SplitConfiguration params) {
 		this.inputFile  = inputFile;
@@ -22,6 +23,7 @@ public class FileEncryptAndSplit implements FileAction {
 			split = new FileSplitterByMaxSize(encrypt.getOutputFile(),params);
 		else
 			split = new FileSplitterByPartNumber(encrypt.getOutputFile(),params);
+		toDelete = encrypt.getOutputFile();
 	}
 	
 	public FileEncryptAndSplit(FileConfiguration conf) {
@@ -59,4 +61,8 @@ public class FileEncryptAndSplit implements FileAction {
 		return split.getOutputFile();
 	}
 
+	@Override
+	public void clear() {
+		toDelete.delete();
+	}
 }

@@ -71,4 +71,9 @@ public class FileEncryptor extends FileCipher implements FileAction {
 		return new File(getOutputDir()+File.separator+getInputFile().getName()+".crypt");
 	}
 	
+	@Override
+	public void clear() {
+		//nothing to clear
+	}
+	
 }

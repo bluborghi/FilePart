@@ -6,9 +6,10 @@ import java.io.IOException;
 import dev.blu.model.interfaces.FileAction;
 
 public class FileMergeAndDecrypt implements FileAction {
-	FileAction merge;
-	FileAction decrypt;
-	File inputFile;
+	private FileAction merge;
+	private FileAction decrypt;
+	private File inputFile;
+	private File toDelete;
 	
 	public FileMergeAndDecrypt(File inputFile, SplitConfiguration params) {
 		this.inputFile  = inputFile;
@@ -19,6 +20,7 @@ public class FileMergeAndDecrypt implements FileAction {
 			e.printStackTrace();
 		}
 		decrypt = new FileDecryptor(merge.getOutputFile(), params);
+		toDelete = merge.getOutputFile();
 	}
 	
 	public FileMergeAndDecrypt(FileConfiguration conf) {
@@ -52,6 +54,11 @@ public class FileMergeAndDecrypt implements FileAction {
 	@Override
 	public File getOutputFile() {
 		return decrypt.getOutputFile();
+	}
+
+	@Override
+	public void clear() {
+		toDelete.delete();
 	}
 
 }
