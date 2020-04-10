@@ -16,35 +16,45 @@ import javax.swing.JFileChooser;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import dev.blu.model.AppModel;
 import dev.blu.model.core.FileActionThread;
 import dev.blu.model.core.FileMerger;
 import dev.blu.model.core.FileSplitterByMaxSize;
 import dev.blu.model.core.FileSplitterByPartNumber;
 import dev.blu.model.core.SplitConfiguration;
 import dev.blu.model.enums.ProcessStatus;
-import dev.blu.model.enums.SplitOption;
 import dev.blu.view.AppView;
 
 public class AppController {
 	private AppView view;
+	private AppModel model;
 
-	public AppController(AppView v) {
+	public AppController(AppModel model, AppView v) {
 		setView(v);
+		setModel(model);
 
-		view.setAddButtonActionListener(new AddButtonActionListener());
-		view.setRemoveButtonActionListener(new RemoveButtonActionListener());
-		view.setStartButtonActionListener(new StartButtonActionListener());
-		view.setFileListSelectionListener(new FileListSelectionListener());
-		view.setFocusListener(new DetailsPanelFocusListener());
-		view.addSplitOptionsItemListener(new SplitOptionItemListener());
+//		view.setAddButtonActionListener(new AddButtonActionListener());
+//		view.setRemoveButtonActionListener(new RemoveButtonActionListener());
+//		view.setStartButtonActionListener(new StartButtonActionListener());
+//		view.setFileListSelectionListener(new FileListSelectionListener());
+//		view.setFocusListener(new DetailsPanelFocusListener());
+//		view.addSplitOptionsItemListener(new SplitOptionItemListener());
 	}
 
 	public AppView getView() {
 		return view;
 	}
 
-	public void setView(AppView view) {
+	private void setView(AppView view) {
 		this.view = view;
+	}	
+	
+	public AppModel getModel() {
+		return model;
+	}
+
+	private void setModel(AppModel model) {
+		this.model = model;
 	}
 
 	class AddButtonActionListener implements ActionListener {
@@ -58,140 +68,140 @@ public class AppController {
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				File file = fc.getSelectedFile();
 				System.out.println("Opening: " + file.getAbsolutePath());
-				view.addFile(file);
+				//add what to do with the selected file
 			} else {
 				System.out.println("Open command cancelled by user.");
 			}
 		}
 	}
 
-	class RemoveButtonActionListener implements ActionListener {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			// System.out.println("remove action performed");
-			AppView view = getView();
-			int file_index = view.getSelectedInedex();
-			if (file_index != -1) {
-				view.removeFile(file_index);
-			}
-		}
-	}
+//	class RemoveButtonActionListener implements ActionListener {
+//		@Override
+//		public void actionPerformed(ActionEvent e) {
+//			// System.out.println("remove action performed");
+//			AppView view = getView();
+//			int file_index = view.getSelectedInedex();
+//			if (file_index != -1) {
+//				view.removeFile(file_index);
+//			}
+//		}
+//	}
 
-	class StartButtonActionListener implements ActionListener {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			AppView view = getView();
-			Vector<SplitConfiguration> queue = view.getQueue();
-			HashMap<UUID,FileActionThread> threads = new HashMap<UUID,FileActionThread>();
-			
-			for (SplitConfiguration c : queue) {
-				
-				switch (c.getSplitOption()) {
-				case DoNothing: {
-					break;
-				}
-				case Merge: {
-					File f = view.getFile(c.getId());
-					FileActionThread t = new FileActionThread(new FileMerger(f));
-					threads.put(c.getId(), t);
-					break;
-				}
-				case MergeAndDecrypt: {
-					break;
-				}
-				case SplitAndEncrypt: {
-					break;
-				}
-				case SplitByMaxSize: {
-					File f = view.getFile(c.getId());
-					FileActionThread t = new FileActionThread(new FileSplitterByMaxSize(f,c.getPartSize()));
-					threads.put(c.getId(), t);
-					break;
-				}
-				case SplitByPartNumber: {
-					File f = view.getFile(c.getId());
-					FileActionThread t = new FileActionThread(new FileSplitterByPartNumber(f,c.getPartNumber()));
-					threads.put(c.getId(), t);
-					break;
-				}
-				}
-				
-			}
-			
-			threads.forEach((id,t) -> {
-				t.start();
-				view.setProcessStatus(id, ProcessStatus.Running);
-			});
-			
-			new ProgressThread(threads).start();
-			view.setEnabledStartButton(false);
-		}
-	}
-
-	class FileListSelectionListener implements ListSelectionListener {
-		@Override
-		public void valueChanged(ListSelectionEvent e) {
-			AppView view = getView();
-			File current = view.getSelectedFile();
-			if (current != null) {
-				view.showStatus("Current File: " + current.getPath());
-				view.loadConfig();
-			} else {
-				view.showStatus("");
-			}
-		}
-	}
-	
-	
-	class SplitOptionItemListener implements ItemListener{
-	    @Override
-	    public void itemStateChanged(ItemEvent event) {
-	       if (event.getStateChange() == ItemEvent.SELECTED) {
-	          SplitOption item = (SplitOption) event.getItem();
-	          System.out.println(item);
-	       }
-	    }
-	}
-
-	class DetailsPanelFocusListener implements FocusListener {
-
-		@Override
-		public void focusGained(FocusEvent e) {
-
-		}
-
-		@Override
-		public void focusLost(FocusEvent e) {
-			view.saveConfig();
-		}
-
-	}
-
-	class ProgressThread extends Thread {
-		HashMap<UUID,FileActionThread> threads;
-		
-		public ProgressThread(HashMap<UUID,FileActionThread> threads) {
-			this.threads = threads;
-		}
-		
-		@Override
-		public void run() {
-			boolean someoneAlive = true;
-			while (someoneAlive) {
-				someoneAlive = false;
-				for(Map.Entry<UUID, FileActionThread> entry : threads.entrySet()) {
-				    FileActionThread t = entry.getValue();
-				    UUID id = entry.getKey();
-				    if (t.isAlive()) {
-				    	someoneAlive = true;
-				    	view.setPercentage(id,t.getPercentage());
-				    }
-				    else {
-				    	view.setProcessStatus(id, ProcessStatus.Completed);
-				    }
-				}
-			}
-			view.setEnabledStartButton(true);
-		}
-	}
+//	class StartButtonActionListener implements ActionListener {
+//		@Override
+//		public void actionPerformed(ActionEvent e) {
+//			AppView view = getView();
+//			Vector<SplitConfiguration> queue = view.getQueue();
+//			HashMap<UUID,FileActionThread> threads = new HashMap<UUID,FileActionThread>();
+//			
+//			for (SplitConfiguration c : queue) {
+//				
+//				switch (c.getSplitOption()) {
+//				case DoNothing: {
+//					break;
+//				}
+//				case Merge: {
+//					File f = view.getFile(c.getId());
+//					FileActionThread t = new FileActionThread(new FileMerger(f));
+//					threads.put(c.getId(), t);
+//					break;
+//				}
+//				case MergeAndDecrypt: {
+//					break;
+//				}
+//				case SplitAndEncrypt: {
+//					break;
+//				}
+//				case SplitByMaxSize: {
+//					File f = view.getFile(c.getId());
+//					FileActionThread t = new FileActionThread(new FileSplitterByMaxSize(f,c.getPartSize()));
+//					threads.put(c.getId(), t);
+//					break;
+//				}
+//				case SplitByPartNumber: {
+//					File f = view.getFile(c.getId());
+//					FileActionThread t = new FileActionThread(new FileSplitterByPartNumber(f,c.getPartNumber()));
+//					threads.put(c.getId(), t);
+//					break;
+//				}
+//				}
+//				
+//			}
+//			
+//			threads.forEach((id,t) -> {
+//				t.start();
+//				view.setProcessStatus(id, ProcessStatus.Running);
+//			});
+//			
+//			new ProgressThread(threads).start();
+//			view.setEnabledStartButton(false);
+//		}
+//	}
+//
+//	class FileListSelectionListener implements ListSelectionListener {
+//		@Override
+//		public void valueChanged(ListSelectionEvent e) {
+//			AppView view = getView();
+//			File current = view.getSelectedFile();
+//			if (current != null) {
+//				view.showStatus("Current File: " + current.getPath());
+//				view.loadConfig();
+//			} else {
+//				view.showStatus("");
+//			}
+//		}
+//	}
+//	
+//	
+//	class SplitOptionItemListener implements ItemListener{
+//	    @Override
+//	    public void itemStateChanged(ItemEvent event) {
+//	       if (event.getStateChange() == ItemEvent.SELECTED) {
+//	          SplitOption item = (SplitOption) event.getItem();
+//	          System.out.println(item);
+//	       }
+//	    }
+//	}
+//
+//	class DetailsPanelFocusListener implements FocusListener {
+//
+//		@Override
+//		public void focusGained(FocusEvent e) {
+//
+//		}
+//
+//		@Override
+//		public void focusLost(FocusEvent e) {
+//			view.saveConfig();
+//		}
+//
+//	}
+//
+//	class ProgressThread extends Thread {
+//		HashMap<UUID,FileActionThread> threads;
+//		
+//		public ProgressThread(HashMap<UUID,FileActionThread> threads) {
+//			this.threads = threads;
+//		}
+//		
+//		@Override
+//		public void run() {
+//			boolean someoneAlive = true;
+//			while (someoneAlive) {
+//				someoneAlive = false;
+//				for(Map.Entry<UUID, FileActionThread> entry : threads.entrySet()) {
+//				    FileActionThread t = entry.getValue();
+//				    UUID id = entry.getKey();
+//				    if (t.isAlive()) {
+//				    	someoneAlive = true;
+//				    	view.setPercentage(id,t.getPercentage());
+//				    }
+//				    else {
+//				    	view.setProcessStatus(id, ProcessStatus.Completed);
+//				    }
+//				}
+//			}
+//			view.setEnabledStartButton(true);
+//		}
+//	}
 }

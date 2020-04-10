@@ -9,6 +9,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.TableModel;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
@@ -44,8 +45,8 @@ import com.jgoodies.forms.layout.RowSpec;
 import dev.blu.model.core.SplitConfiguration;
 import dev.blu.model.enums.ByteUnit;
 import dev.blu.model.enums.ProcessStatus;
-import dev.blu.model.enums.SplitOption;
 import dev.blu.model.output.FileTableModel;
+import dev.blu.view.enums.ActionType;
 
 import com.jgoodies.forms.layout.FormSpecs;
 import java.awt.GridLayout;
@@ -61,7 +62,7 @@ public class AppView extends JFrame {
 
 	private JPanel contentPane;
 	private JPanel detailsPanel;
-	private JComboBox<SplitOption> splitOptions;
+	private JComboBox<ActionType> actionTypes;
 	private JFormattedTextField txtSize;
 	private JComboBox<ByteUnit> unitSelector;
 	private JFormattedTextField txtParts;
@@ -71,7 +72,7 @@ public class AppView extends JFrame {
 	private JButton addButton;
 	private JButton removeButton;
 	private JButton startButton;
-	private FileTableModel ftm;
+//	private FileTableModel ftm;
 	private JLabel lblStatus;
 	private JTable fileList;
 	private HashMap<UUID, SplitConfiguration> configs;
@@ -107,14 +108,10 @@ public class AppView extends JFrame {
 		panel.add(detailsPanel, BorderLayout.NORTH);
 		detailsPanel.setLayout(new MigLayout("", "[240px,grow]", "[][24px][][24px][]"));
 
-		splitOptions = new JComboBox<SplitOption>();
-		splitOptions.addItem(SplitOption.DoNothing);
-		splitOptions.addItem(SplitOption.Merge);
-		splitOptions.addItem(SplitOption.MergeAndDecrypt);
-		splitOptions.addItem(SplitOption.SplitAndEncrypt);
-		splitOptions.addItem(SplitOption.SplitByMaxSize);
-		splitOptions.addItem(SplitOption.SplitByPartNumber);
-		detailsPanel.add(splitOptions, "flowx,cell 0 0,alignx left");
+		actionTypes = new JComboBox<ActionType>();
+		actionTypes.addItem(ActionType.Split);
+		actionTypes.addItem(ActionType.Merge);
+		detailsPanel.add(actionTypes, "flowx,cell 0 0,alignx left");
 
 		JLabel lblPartSize = new JLabel("Part Size:");
 		detailsPanel.add(lblPartSize, "flowx,cell 0 1,alignx left,aligny center");
@@ -167,8 +164,7 @@ public class AppView extends JFrame {
 		JScrollPane scrollPane = new JScrollPane();
 		contentPane.add(scrollPane, BorderLayout.CENTER);
 
-		ftm = new FileTableModel();
-		fileList = new JTable(ftm);
+		fileList = new JTable();
 		fileList.setRowSelectionAllowed(true);
 
 		scrollPane.setViewportView(fileList);
@@ -193,21 +189,22 @@ public class AppView extends JFrame {
 		return this.fileChooser;
 	}
 
-	public void setAddButtonActionListener(ActionListener buttonActionListener) {
-		addButton.addActionListener(buttonActionListener);
-	}
-
-	public void setRemoveButtonActionListener(ActionListener buttonActionListener) {
-		removeButton.addActionListener(buttonActionListener);
-	}
-
-	public void setStartButtonActionListener(ActionListener buttonActionListener) {
-		startButton.addActionListener(buttonActionListener);
-	}
-
-	public void setFileListSelectionListener(ListSelectionListener listSelectionListener) {
-		fileList.getSelectionModel().addListSelectionListener(listSelectionListener);
-	}
+//just use the getter for the specified component and add the listener from controller
+//	public void setAddButtonActionListener(ActionListener buttonActionListener) {
+//		addButton.addActionListener(buttonActionListener);
+//	}
+//
+//	public void setRemoveButtonActionListener(ActionListener buttonActionListener) {
+//		removeButton.addActionListener(buttonActionListener);
+//	}
+//
+//	public void setStartButtonActionListener(ActionListener buttonActionListener) {
+//		startButton.addActionListener(buttonActionListener);
+//	}
+//
+//	public void setFileListSelectionListener(ListSelectionListener listSelectionListener) {
+//		fileList.getSelectionModel().addListSelectionListener(listSelectionListener);
+//	}
 
 	public void setFocusListener(FocusListener fl) {
 		for (Component c : detailsPanel.getComponents()) {
@@ -215,13 +212,32 @@ public class AppView extends JFrame {
 		}
 	}
 	
-	public void addFile(File file, boolean selectNewFile) {
-		System.out.println("added file " + file.getName());
-		if (file != null) {
-			ftm.addFile(file);
-			selectRows(ftm.getRowCount() - 1, ftm.getRowCount() - 1);
-		}
-	}
+	
+	public void setTableModel(TableModel m) {
+		fileList.setModel(m);
+	} //AppModel holds the table model
+	
+//	public void addFile(File file, boolean selectNewFile) {
+//		System.out.println("added file " + file.getName());
+//		if (file != null) {
+//			ftm.addFile(file);
+//			selectRows(ftm.getRowCount() - 1, ftm.getRowCount() - 1);
+//		}
+//	}
+//	public void addFile(File file) {
+//		addFile(file, true);
+//	}
+//
+//	public void removeFile(int index) {
+//		if (ftm.removeFileAt(index) != 0)
+//			return;
+//		if (ftm.getRowCount() != 0) {
+//			if (rowExists(index)) // user deleted a row in the middle
+//				selectRows(index, index);
+//			else // user deleted the last row
+//				selectRows(index - 1, index - 1);
+//		}
+//	}
 
 	public int selectRows(int row0, int row1) {
 		fileList.clearSelection();
@@ -233,39 +249,13 @@ public class AppView extends JFrame {
 		return 0;
 	}
 
-	public void addFile(File file) {
-		addFile(file, true);
-	}
-
-	public void removeFile(int index) {
-		if (ftm.removeFileAt(index) != 0)
-			return;
-		if (ftm.getRowCount() != 0) {
-			if (rowExists(index)) // user deleted a row in the middle
-				selectRows(index, index);
-			else // user deleted the last row
-				selectRows(index - 1, index - 1);
-		}
-	}
 
 	public boolean rowExists(int row) {
-		return row < ftm.getRowCount();
+		return row < fileList.getRowCount();
 	}
 
-	public File getSelectedFile() {
-		int row = fileList.getSelectedRow();
-		if (row == -1)
-			return null;
-		else
-			return ftm.getFile(row);
-	}
-
-	public UUID getSelectedId() {
-		int row = fileList.getSelectedRow();
-		if (row == -1)
-			return null;
-		else
-			return ftm.getId(row);
+	public int getSelectedIndex() {
+		return fileList.getSelectedRow();
 	}
 
 	public void showStatus(String status) {
@@ -286,56 +276,46 @@ public class AppView extends JFrame {
 		}
 		return config;
 	}
-	
-	public SplitConfiguration getConfig(int index) {
-		UUID id = ftm.getId(index);
-		return getConfigById(id);
-	}
 
-	public SplitConfiguration getCurrentConfig() {
-		UUID id = getSelectedId();
-		return getConfigById(id);
-	}
+//	public void loadConfig() {
+//		SplitConfiguration config = getCurrentConfig();
+//		if (config == null) // no file selected
+//			return;
+//
+//		actionTypes.setSelectedItem(config.getSplitOption());
+//		setValueByNumber(config.getPartNumber(), txtParts);
+//		setValueByNumber(config.getPartSize(), txtSize);
+//		setPassword(config.getPw());
+//		unitSelector.setSelectedItem(config.getUnit());
+//
+//		// TODO implement output dir load
+//	}
 
-	public void loadConfig() {
-		SplitConfiguration config = getCurrentConfig();
-		if (config == null) // no file selected
-			return;
+//	private void setPassword(char[] pw) {
+//		String p = "";
+//		if (pw != null) {
+//			for (char c : pw) {
+//				p = p + c;
+//			} 			
+//		}
+//		passwordField.setText(p);
+//	}
 
-		splitOptions.setSelectedItem(config.getSplitOption());
-		setValueByNumber(config.getPartNumber(), txtParts);
-		setValueByNumber(config.getPartSize(), txtSize);
-		setPassword(config.getPw());
-		unitSelector.setSelectedItem(config.getUnit());
-
-		// TODO implement output dir load
-	}
-
-	private void setPassword(char[] pw) {
-		String p = "";
-		if (pw != null) {
-			for (char c : pw) {
-				p = p + c;
-			} 			
-		}
-		passwordField.setText(p);
-	}
-
-	public void saveConfig() {
-		SplitConfiguration config = getCurrentConfig();
-		if (config == null) // no file selected
-			return;
-
-		config.setSplitOption((SplitOption) splitOptions.getSelectedItem());
-		if (txtParts.getValue() instanceof Long)
-			config.setPartNumber((long) txtParts.getValue());
-		if (txtSize.getValue() instanceof Long)
-			config.setPartSize((long) txtSize.getValue());
-		config.setPw(passwordField.getPassword());
-		config.setUnit((ByteUnit) unitSelector.getSelectedItem());
-
-		// TODO implement output dir save
-	}
+//	public void saveConfig() {
+//		SplitConfiguration config = getCurrentConfig();
+//		if (config == null) // no file selected
+//			return;
+//
+//		config.setSplitOption((SplitOption) actionTypes.getSelectedItem());
+//		if (txtParts.getValue() instanceof Long)
+//			config.setPartNumber((long) txtParts.getValue());
+//		if (txtSize.getValue() instanceof Long)
+//			config.setPartSize((long) txtSize.getValue());
+//		config.setPw(passwordField.getPassword());
+//		config.setUnit((ByteUnit) unitSelector.getSelectedItem());
+//
+//		// TODO implement output dir save
+//	}
 
 
 	private void setValueByNumber(long i, JFormattedTextField txt) {
@@ -345,35 +325,35 @@ public class AppView extends JFrame {
 			txt.setValue(i);
 	}
 
-	public Vector<SplitConfiguration> getQueue() {
-		Vector<SplitConfiguration> queue = new Vector<SplitConfiguration>(); 
-		
-		for (int i = 0; i<ftm.getRowCount(); i++) {
-			SplitConfiguration config = getConfig(i);
-			queue.add(config);
-		}
-		
-		return queue;
-	}
-
-	public void setProcessStatus(UUID id, ProcessStatus ps) {
-		ftm.setProcessStatus(id, ps);
-	}
-
-	public File getFile(UUID id) {
-		return ftm.getFile(id);
-	}
-
-	public void setPercentage(UUID id, double percentage) {
-		ftm.setPercentage(id, percentage);
-	}
-
-	public void setEnabledStartButton(boolean b) {
-		startButton.setEnabled(b);
-	}
-	
-	public void addSplitOptionsItemListener(ItemListener itemListener) {
-		splitOptions.addItemListener(itemListener);
-	}
+//	public Vector<SplitConfiguration> getQueue() {
+//		Vector<SplitConfiguration> queue = new Vector<SplitConfiguration>(); 
+//		
+//		for (int i = 0; i<ftm.getRowCount(); i++) {
+//			SplitConfiguration config = getConfig(i);
+//			queue.add(config);
+//		}
+//		
+//		return queue;
+//	}
+//
+//	public void setProcessStatus(UUID id, ProcessStatus ps) {
+//		ftm.setProcessStatus(id, ps);
+//	}
+//
+//	public File getFile(UUID id) {
+//		return ftm.getFile(id);
+//	}
+//
+//	public void setPercentage(UUID id, double percentage) {
+//		ftm.setPercentage(id, percentage);
+//	}
+//
+//	public void setEnabledStartButton(boolean b) {
+//		startButton.setEnabled(b);
+//	}
+//	
+//	public void addSplitOptionsItemListener(ItemListener itemListener) {
+//		actionTypes.addItemListener(itemListener);
+//	}
 
 }
