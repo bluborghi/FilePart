@@ -1,4 +1,4 @@
-package dev.blu.model;
+package dev.blu.model.deprecated;
 
 
 public enum SplitOption {
@@ -7,7 +7,9 @@ public enum SplitOption {
 	SplitAndEncrypt("Split and encrypt"),
 	Merge("Merge"),
 	MergeAndDecrypt("Merge and decrypt"),
-	DoNothing("Do nothing");
+	DoNothing("Do nothing"),
+	Encrypt("Encrypt"), 
+	Decrypt("Decrypt");
 	
 	private String name;
 	

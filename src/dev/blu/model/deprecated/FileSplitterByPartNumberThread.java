@@ -1,13 +1,16 @@
-package dev.blu.model;
+package dev.blu.model.deprecated;
 
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalTime;
 
+import dev.blu.model.core.FileSplitterByPartNumber;
+import dev.blu.model.interfaces.FileSplitter;
+
 import static java.time.temporal.ChronoUnit.MILLIS;
 
-public class FileSplitterByPartNumberThread extends Thread {
-    private String fileDir;
+public class FileSplitterByPartNumberThread { //extends Thread {
+  /*  private String fileDir;
     private File f;
     private long parts;
 
@@ -54,4 +57,5 @@ public class FileSplitterByPartNumberThread extends Thread {
     public void setFile(File f) {
         this.f = f;
     }
+    */
 }

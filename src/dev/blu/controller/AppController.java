@@ -15,13 +15,14 @@ import java.util.Vector;
 import javax.swing.JFileChooser;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import dev.blu.model.FileActionThread;
-import dev.blu.model.FileMerger;
-import dev.blu.model.FileSplitterByMaxSize;
-import dev.blu.model.FileSplitterByPartNumber;
-import dev.blu.model.ProcessStatus;
-import dev.blu.model.SplitConfiguration;
-import dev.blu.model.SplitOption;
+
+import dev.blu.model.core.FileActionThread;
+import dev.blu.model.core.FileMerger;
+import dev.blu.model.core.FileSplitterByMaxSize;
+import dev.blu.model.core.FileSplitterByPartNumber;
+import dev.blu.model.core.SplitConfiguration;
+import dev.blu.model.enums.ProcessStatus;
+import dev.blu.model.enums.SplitOption;
 import dev.blu.view.AppView;
 
 public class AppController {

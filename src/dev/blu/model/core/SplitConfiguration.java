@@ -1,10 +1,11 @@
-package dev.blu.model;
+package dev.blu.model.core;
 
 import java.io.File;
 import java.util.UUID;
 
+import dev.blu.model.enums.ByteUnit;
+
 public class SplitConfiguration {
-	private SplitOption splitOption;
 	private long partNumber;
 	private long partSize;
 	private ByteUnit unit;
@@ -12,10 +13,9 @@ public class SplitConfiguration {
 	private String outputDir;
 	private UUID id;
 	
-	public SplitConfiguration(UUID id, SplitOption splitOption, int partNumber, long partSize, ByteUnit unit, char[] pw,
+	public SplitConfiguration(UUID id,int partNumber, long partSize, ByteUnit unit, char[] pw,
 			String outputDir) {
 		this.id = id;
-		this.splitOption = splitOption;
 		this.partNumber = partNumber;
 		this.partSize = partSize;
 		this.unit = unit;
@@ -24,17 +24,9 @@ public class SplitConfiguration {
 	}
 	
 	public SplitConfiguration(UUID id) {
-		this(id, SplitOption.DoNothing, -1, -1, ByteUnit.MiB, null , "");
+		this(id, -1, -1, ByteUnit.MiB, null , "");
 	}
-
-	public SplitOption getSplitOption() {
-		return splitOption;
-	}
-
-	public void setSplitOption(SplitOption splitOption) {
-		this.splitOption = splitOption;
-	}
-
+	
 	public long getPartNumber() {
 		return partNumber;
 	}

@@ -1,4 +1,4 @@
-package dev.blu.model;
+package dev.blu.model.helpers;
 
 import java.io.File;
 import java.io.FileInputStream;

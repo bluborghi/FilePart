@@ -1,4 +1,4 @@
-package dev.blu.model;
+package dev.blu.model.output;
 
 import java.io.File;
 import java.util.UUID;
@@ -6,23 +6,20 @@ import java.util.Vector;
 
 import javax.swing.table.AbstractTableModel;
 
+import dev.blu.model.core.FileConfiguration;
+import dev.blu.model.enums.ProcessStatus;
+
 public class FileTableModel extends AbstractTableModel {
-	private Vector<File> files;
-	private Vector<UUID> ids;
-	private Vector<ProcessStatus> states;
-	private Vector<Integer> percentages;
+	private Vector<FileConfiguration> configs;
 	private String[] cols = {"Name","Status","%"};
 	
 	public FileTableModel() {
-		files = new Vector<File>(0,5);
-		ids = new Vector<UUID>(0,5);
-		states = new Vector<ProcessStatus>(0,5);
-		percentages = new Vector<Integer>(0,5);
+		configs = new Vector<FileConfiguration>(0,5);
 	}
 	
 	@Override
 	public int getRowCount() {
-		return files.size();
+		return configs.size();
 	}
 	
 	@Override
@@ -33,16 +30,19 @@ public class FileTableModel extends AbstractTableModel {
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
 		if (columnIndex == 0) {
-			return files.get(rowIndex).getName();
+			return configs.get(rowIndex).getFile().getName();
 		}
 		if (columnIndex == 1) {
-			return states.get(rowIndex).toString();
+			return configs.get(rowIndex).getState().toString();
 		}
 		if (columnIndex == 2) {
-			if (states.get(rowIndex) == ProcessStatus.Running) {
-				if (percentages.get(rowIndex) != -1) {
-					return percentages.get(rowIndex).toString() + "%";					
+			if (configs.get(rowIndex).getState() == ProcessStatus.Running) {
+				if (configs.get(rowIndex).getPercentage() != -1) {
+					return configs.get(rowIndex).getPercentage() + "%";					
 				}
+			} else
+			if (configs.get(rowIndex).getState() == ProcessStatus.Completed) {	
+				return 100 + "%";					
 			} 
 			return "";
 		}
@@ -58,18 +58,23 @@ public class FileTableModel extends AbstractTableModel {
         return cols[col_index].toString();
     }
 
-	public void addFile(File file) {
-		files.add(file);
-		ids.add(UUID.randomUUID());
-		states.add(ProcessStatus.Ready);
-		percentages.add(-1);
+	public UUID addFile(File file, UUID id) {
+		FileConfiguration c = new FileConfiguration(file, id);
+		configs.add(c);
 		fireTableRowsInserted(getRowCount(),getRowCount());
+		return id;
 	}
+	
+	
 
+	public int removeFile(UUID id) {
+		int index = getIndex(id);
+		return removeFileAt(index);
+	}
+	
 	public int removeFileAt(int index) {
 		try {
-			files.remove(index);
-			ids.remove(index);
+			configs.remove(index);
 			fireTableRowsDeleted(index, index);
 		} catch (ArrayIndexOutOfBoundsException e) {
 			return 1;
@@ -77,17 +82,44 @@ public class FileTableModel extends AbstractTableModel {
 		return 0;
 	}
 	
+	public FileConfiguration getConfig(int index) {
+		return configs.get(index);
+	}
+
+	public FileConfiguration getConfig(UUID id) {
+		return getConfig(getIndex(id));
+	}
+	
+	public int getIndex(UUID id) {
+		int i = 0;
+		for (FileConfiguration fc : configs) {
+			if (fc.getId().equals(id)) {
+				return i;
+			}
+			i++;
+		}
+		return -1;
+	}
+
+	public Vector<FileConfiguration> getConfigs() {
+		return configs;		
+	}
+
+	
+	
+	
+	
+	
+	
+	/* OLD DEPRECATED STUFF
 	public void setProcessStatus(UUID id, ProcessStatus ps) {
-		int index = ids.indexOf(id);
+		int index = configIndexOf(id);
 		setProcessStatus(index, ps);
 	}
 	
 	public void setProcessStatus(int index, ProcessStatus ps) {
 		try {
-			if (index == states.size())
-				throw new IndexOutOfBoundsException();
-			
-			states.set(index, ps); //also throws IndexOutOfBoundsException
+			configs.get(index).setState(ps);
 			fireTableRowsUpdated(index, index);
 		} catch (IndexOutOfBoundsException e) {
 			System.err.println("cant set index "+index+" because out of bounds (maybe exceeded states.size() = "+states.size()+")");
@@ -96,7 +128,7 @@ public class FileTableModel extends AbstractTableModel {
 	
 	public UUID getId(int index) {
 		try {
-			return ids.get(index);			
+			return configs.get(index);			
 		} catch (IndexOutOfBoundsException e) {
 			return null;
 		}
@@ -126,5 +158,7 @@ public class FileTableModel extends AbstractTableModel {
 		//System.out.println("setting "+ percentages.get(index)+ " at index " + index + " => " + Math.round(percentage));
 		percentages.set(index, (int) Math.round(percentage));
 		fireTableRowsUpdated(index, index);
-	}
+	} */
+
+	
 }

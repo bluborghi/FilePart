@@ -1,11 +1,13 @@
-package dev.blu.model;
+package dev.blu.model.core;
 
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
-import static dev.blu.model.FileHelper.*;
+import dev.blu.model.interfaces.FileAction;
+
+import static dev.blu.model.helpers.FileHelper.*;
 
 import java.io.*;
 import java.security.InvalidAlgorithmParameterException;
@@ -56,17 +58,23 @@ encrypt input file with key generated from user's password, hash the password an
  */
 
 
-public class FileCipher {
+public abstract class FileCipher {
     private static int DEFAULT_BUFFER_LENGTH = 4 * 1024 * 1024;
     private int bufferLength;
     private File f;
     private String outputDir;
+    private double percentage = 0;
 
-    public FileCipher(File f, String outputDir, int bufferLength) {
-        setFile(f);
-        setBufferLength(bufferLength);
+    protected FileCipher() {
+    	//don't use this
     }
-
+    
+    protected FileCipher(File f, String outputDir) {
+        setFile(f);
+        setOutputDir(outputDir);
+        setBufferLength(DEFAULT_BUFFER_LENGTH);
+    }
+/*
     public FileCipher(File f, String outputDir) {
         this (f,outputDir,DEFAULT_BUFFER_LENGTH);
     }
@@ -74,13 +82,16 @@ public class FileCipher {
     public FileCipher(File f) {
         this(f, getParentDirectory(f.getAbsolutePath()), DEFAULT_BUFFER_LENGTH);
     }
-
+*/
     public String getOutputDir() {
         return outputDir;
     }
 
     public void setOutputDir(String outputDir) {
-        this.outputDir = outputDir;
+    	if ((outputDir == null || outputDir.isEmpty()) && getInputFile() != null )
+    		this.outputDir = getInputFile().getParent();
+    	else 
+    		this.outputDir = outputDir;
     }
 
     public int getBufferLength() {
@@ -91,21 +102,29 @@ public class FileCipher {
         this.bufferLength = bufferLength;
     }
 
-    public File getFile() {
+    public File getInputFile() {
         return f;
     }
 
     private void setFile(File f) {
         this.f = f;
     }
+   
+    public double getPercentage() {
+		return percentage;
+	}
 
-    public File Encrypt(String password) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, NoSuchPaddingException, InvalidAlgorithmParameterException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
+	protected void setPercentage(double percentage) {
+		this.percentage = percentage;
+	}
+
+	public File Encrypt(char[] password) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, NoSuchPaddingException, InvalidAlgorithmParameterException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
         byte[] salt = new byte[8];
         SecureRandom srandom = new SecureRandom();
         srandom.nextBytes(salt);
         SecretKeyFactory factory =
-                SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
-        KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 10000, 128);
+        SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+        KeySpec spec = new PBEKeySpec(password, salt, 10000, 128);
         SecretKey tmp = factory.generateSecret(spec);
         SecretKeySpec skey = new SecretKeySpec(tmp.getEncoded(), "AES");
 
@@ -113,8 +132,9 @@ public class FileCipher {
         srandom.nextBytes(iv);
         IvParameterSpec ivspec = new IvParameterSpec(iv);
 
-        String fileName = getFile().getAbsoluteFile() + ".crypt";
-        File output = new File(fileName);
+        //getOutputDir()+File.separator+fileName
+        String fileName = getInputFile().getName() + ".crypt";
+        File output = new File(getOutputDir()+File.separator+fileName);
         FileOutputStream out = new FileOutputStream(output);
         out.write(salt);
         out.write(iv);
@@ -122,7 +142,33 @@ public class FileCipher {
         Cipher ci = Cipher.getInstance("AES/CBC/PKCS5Padding");
         ci.init(Cipher.ENCRYPT_MODE, skey, ivspec);
 
-        FileInputStream in = new FileInputStream(getFile());
+        FileInputStream in = new FileInputStream(getInputFile());
+        //System.out.println("input file length: "+getFile().length());
+        //System.out.println("initial output file length: "+output.length());
+        processFile(ci, in, out);
+        //System.out.println("final output file length: "+output.length());
+        in.close();
+        out.close();
+        return output;
+    }
+
+    public File Decrypt(char[] password) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, NoSuchPaddingException, InvalidAlgorithmParameterException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
+        FileInputStream in = new FileInputStream(getInputFile());
+        byte[] salt = new byte[8], iv = new byte[128/8];
+        in.read(salt);
+        in.read(iv);
+
+        SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+        KeySpec spec = new PBEKeySpec(password, salt, 10000, 128);
+        SecretKey tmp = factory.generateSecret(spec);
+        SecretKeySpec skey = new SecretKeySpec(tmp.getEncoded(), "AES");
+
+        Cipher ci = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        ci.init(Cipher.DECRYPT_MODE, skey, new IvParameterSpec(iv));
+
+        String fileName = removeFileExtension(getInputFile().getName());
+        File output = new File(getOutputDir()+File.separator+fileName);
+        FileOutputStream out = new FileOutputStream(output);
         processFile(ci, in, out);
 
         in.close();
@@ -130,38 +176,24 @@ public class FileCipher {
         return output;
     }
 
-    public File Decrypt(String password) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, NoSuchPaddingException, InvalidAlgorithmParameterException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
-        FileInputStream in = new FileInputStream(getFile());
-        byte[] salt = new byte[8], iv = new byte[128/8];
-        in.read(salt);
-        in.read(iv);
-
-        SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
-        KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 10000, 128);
-        SecretKey tmp = factory.generateSecret(spec);
-        SecretKeySpec skey = new SecretKeySpec(tmp.getEncoded(), "AES");
-
-        Cipher ci = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        ci.init(Cipher.DECRYPT_MODE, skey, new IvParameterSpec(iv));
-
-        String fileName = removeFileExtension(getFile().getAbsolutePath());
-        System.out.println(getFile().getAbsoluteFile());
-        File output = new File(fileName);
-        FileOutputStream out = new FileOutputStream(output);
-        processFile(ci, in, out);
-
-        return output;
-    }
-
     private void processFile(Cipher ci, InputStream in, OutputStream out) throws javax.crypto.IllegalBlockSizeException, javax.crypto.BadPaddingException, java.io.IOException {
         byte[] ibuf = new byte[getBufferLength()];
         int len;
+        //System.out.println(ci.getOutputSize(getBufferLength()));
+        //System.out.println(getBufferLength());
+        long totalBytes = getInputFile().length();
+        long bytesRead = 0;
         while ((len = in.read(ibuf)) != -1) {
+        	bytesRead += len;
+        	setPercentage((double) 100*bytesRead/totalBytes);
             byte[] obuf = ci.update(ibuf, 0, len);
-            if (obuf != null) out.write(obuf);
+            if (obuf != null) {
+            	out.write(obuf);
+            }
         }
         byte[] obuf = ci.doFinal();
         if (obuf != null) out.write(obuf);
+        setPercentage(100);
     }
 }
 
