@@ -75,7 +75,7 @@ public class Main {
     	AppModel model = new AppModel();
     	AppView view = new AppView();
     	AppController controller = new AppController(model,view);
-    	view.setVisible(true);
+    	
     	
     	
 //    	UUID[] ids = new UUID[5];

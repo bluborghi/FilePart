@@ -189,24 +189,24 @@ public class AppView extends JFrame {
 		return this.fileChooser;
 	}
 
-//just use the getter for the specified component and add the listener from controller
-//	public void setAddButtonActionListener(ActionListener buttonActionListener) {
-//		addButton.addActionListener(buttonActionListener);
-//	}
-//
-//	public void setRemoveButtonActionListener(ActionListener buttonActionListener) {
-//		removeButton.addActionListener(buttonActionListener);
-//	}
-//
-//	public void setStartButtonActionListener(ActionListener buttonActionListener) {
-//		startButton.addActionListener(buttonActionListener);
-//	}
-//
-//	public void setFileListSelectionListener(ListSelectionListener listSelectionListener) {
-//		fileList.getSelectionModel().addListSelectionListener(listSelectionListener);
-//	}
 
-	public void setFocusListener(FocusListener fl) {
+	public void addAddButtonActionListener(ActionListener buttonActionListener) {
+		addButton.addActionListener(buttonActionListener);
+	}
+
+	public void addRemoveButtonActionListener(ActionListener buttonActionListener) {
+		removeButton.addActionListener(buttonActionListener);
+	}
+
+	public void addStartButtonActionListener(ActionListener buttonActionListener) {
+		startButton.addActionListener(buttonActionListener);
+	}
+
+	public void addFileListSelectionListener(ListSelectionListener listSelectionListener) {
+		fileList.getSelectionModel().addListSelectionListener(listSelectionListener);
+	}
+
+	public void addDetailsPanelFocusListener(FocusListener fl) {
 		for (Component c : detailsPanel.getComponents()) {
 			c.addFocusListener(fl);
 		}

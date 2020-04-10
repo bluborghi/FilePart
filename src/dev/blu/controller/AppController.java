@@ -2,56 +2,39 @@ package dev.blu.controller;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 import java.util.Vector;
 
 import javax.swing.JFileChooser;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-
 import dev.blu.model.AppModel;
 import dev.blu.model.core.FileActionThread;
-import dev.blu.model.core.FileMerger;
-import dev.blu.model.core.FileSplitterByMaxSize;
-import dev.blu.model.core.FileSplitterByPartNumber;
 import dev.blu.model.core.SplitConfiguration;
-import dev.blu.model.enums.ProcessStatus;
+import dev.blu.model.enums.ByteUnit;
 import dev.blu.view.AppView;
 
 public class AppController {
 	private AppView view;
 	private AppModel model;
 
-	public AppController(AppModel model, AppView v) {
+	public AppController(AppModel m, AppView v) {
 		setView(v);
-		setModel(model);
-
-//		view.setAddButtonActionListener(new AddButtonActionListener());
-//		view.setRemoveButtonActionListener(new RemoveButtonActionListener());
-//		view.setStartButtonActionListener(new StartButtonActionListener());
+		setModel(m);
+		
+		view.setTableModel(model.getTableModel());
+		
+		view.addAddButtonActionListener(new AddButtonActionListener());
+		view.addRemoveButtonActionListener(new RemoveButtonActionListener());
+		view.addStartButtonActionListener(new StartButtonActionListener());
 //		view.setFileListSelectionListener(new FileListSelectionListener());
 //		view.setFocusListener(new DetailsPanelFocusListener());
 //		view.addSplitOptionsItemListener(new SplitOptionItemListener());
-	}
-
-	public AppView getView() {
-		return view;
+		view.setVisible(true);
 	}
 
 	private void setView(AppView view) {
 		this.view = view;
 	}	
-	
-	public AppModel getModel() {
-		return model;
-	}
 
 	private void setModel(AppModel model) {
 		this.model = model;
@@ -60,37 +43,70 @@ public class AppController {
 	class AddButtonActionListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			// System.out.println("add action performed");
-			AppView view = getView();
+			//System.out.println("add action performed");
 			JFileChooser fc = view.getFileChooser();
 			int returnVal = fc.showOpenDialog(view);
 
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				File file = fc.getSelectedFile();
-				System.out.println("Opening: " + file.getAbsolutePath());
-				//add what to do with the selected file
+				//System.out.println("Opening: " + file.getAbsolutePath());
+				UUID id = model.addFile(file);
+				//model.updateConfig(id, new SplitConfiguration(id, 3, 0, ByteUnit.B, "caccamelone".toCharArray(), "/run/media/blubo/Volume/FilePart/myFolder/mySecondOtherFolder"));
 			} else {
 				System.out.println("Open command cancelled by user.");
 			}
 		}
 	}
 
-//	class RemoveButtonActionListener implements ActionListener {
-//		@Override
-//		public void actionPerformed(ActionEvent e) {
-//			// System.out.println("remove action performed");
-//			AppView view = getView();
-//			int file_index = view.getSelectedInedex();
-//			if (file_index != -1) {
-//				view.removeFile(file_index);
-//			}
-//		}
-//	}
+	class RemoveButtonActionListener implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// System.out.println("remove action performed");
+			
+			int file_index = view.getSelectedInedex();
+			if (file_index != -1) {
+				model.removeFileAt(file_index);
+			}
+		}
+	}
 
-//	class StartButtonActionListener implements ActionListener {
-//		@Override
-//		public void actionPerformed(ActionEvent e) {
-//			AppView view = getView();
+	class StartButtonActionListener implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {    	
+	     	
+			
+			
+	    	Vector<FileActionThread> threads = model.prepareThreads();
+	    	
+	    	for (FileActionThread t : threads) {
+	    		if (t.hasErrors())
+	    			System.err.print(t.getErrorMessage());
+	    	}
+	    	
+	    	Vector<FileActionThread> startedThreads = model.startThreads(threads);
+	    	
+	    	
+	    	boolean running = true;
+	    	while (running) {
+	    		running = false;
+	    		for (FileActionThread t : startedThreads) {
+	    			if (t.isAlive()) {
+	    				running = true;
+	    			}
+	    			System.out.print(t.getFile().getName() + ": " + Math.floor(t.getPercentage()*10)/10 + " | ");
+	    		}    		
+	    		System.out.println();
+	    		try {
+					Thread.sleep(100);
+				} catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} 
+	    	}
+	    	
+	    	System.out.println("done");
+			
+			
 //			Vector<SplitConfiguration> queue = view.getQueue();
 //			HashMap<UUID,FileActionThread> threads = new HashMap<UUID,FileActionThread>();
 //			
@@ -135,9 +151,9 @@ public class AppController {
 //			
 //			new ProgressThread(threads).start();
 //			view.setEnabledStartButton(false);
-//		}
-//	}
-//
+		}
+	}
+
 //	class FileListSelectionListener implements ListSelectionListener {
 //		@Override
 //		public void valueChanged(ListSelectionEvent e) {
