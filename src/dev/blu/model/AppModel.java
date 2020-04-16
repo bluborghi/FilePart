@@ -22,6 +22,8 @@ import dev.blu.model.output.FileTableModel;
 
 public class AppModel {
 	FileTableModel tableModel;
+	Vector<FileActionThread> preparedThreads;
+	Vector<FileConfiguration> preparedConfigs;
 
 	public AppModel() {
 		tableModel = new FileTableModel();
@@ -52,59 +54,98 @@ public class AppModel {
 	public void updateConfig(UUID id, SplitConfiguration splitConfig) {
 		tableModel.getConfig(id).setSplitConfig(splitConfig);
 	}
-	
+
+	public SplitConfiguration getConfig(UUID id) {
+		return tableModel.getConfig(id).getSplitConfig();
+	}
+
 	public Vector<FileActionThread> prepareThreads() {
-		Vector<FileActionThread> threads = new Vector<FileActionThread>(0, 5);
+		preparedThreads = new Vector<FileActionThread>(0, 5);
+		preparedConfigs = new Vector<FileConfiguration>(0, 5);
 		for (FileConfiguration conf : tableModel.getConfigs()) {
 			String err = "";
 			if (conf.getState() == ProcessStatus.Ready) {
 				SplitConfiguration params = conf.getSplitConfig();
 				FileAction action = null;
-				
+
 				if (params == null) {
 					err = err.concat(conf.getFile().getName() + " ignored: ").concat(System.lineSeparator());
 					err = err.concat("No configuration given").concat(System.lineSeparator());
-				}
-				else if (params.getPw() != null && params.getPw().length>0) {
-					if (params.getPartSize()>0 || params.getPartNumber()>0)
+				} else if (params.getPw() != null && params.getPw().length > 0) {
+					if (params.getPartSize() > 0 || params.getPartNumber() > 0)
 						action = new FileEncryptAndSplit(conf);
 					else // no split params => merge
 						action = new FileMergeAndDecrypt(conf);
-				}
-				else { //no password => no encryption
-					if (params.getPartSize()>0)
+				} else { // no password => no encryption
+					if (params.getPartSize() > 0)
 						action = new FileSplitterByMaxSize(conf);
-					if (params.getPartNumber()>0)
+					if (params.getPartNumber() > 0)
 						action = new FileSplitterByPartNumber(conf);
 					else // no split params => merge
 						action = new FileMerger(conf);
 				}
-				
+
 				if (action != null) {
 					String actionError = action.checkForErrors();
-					if (actionError != null && !actionError.isEmpty()){
+					if (actionError != null && !actionError.isEmpty()) {
 						err = err.concat(conf.getFile().getName() + " ignored: ").concat(System.lineSeparator());
 						err = err.concat(actionError);
+						// conf.setState(ProcessStatus.Error);
 					}
 				}
-				
-				threads.add(new FileActionThread(action,err));
+
+				preparedConfigs.add(conf);
+				preparedThreads.add(new FileActionThread(action, err));
 			}
-			
-			
+
 		}
-		
-		return threads;
+		return preparedThreads;
 	}
-	
-	public Vector<FileActionThread> startThreads(Vector<FileActionThread> allThreads){
-		Vector<FileActionThread> startedThreads = new Vector<FileActionThread>(0,5);
-		for (FileActionThread t : allThreads) {
+
+	public Vector<FileActionThread> startThreads() {
+		if (preparedThreads == null || preparedConfigs == null)
+			return null;
+		
+		Vector<FileActionThread> startedThreads = new Vector<FileActionThread>(0, 5);
+		int i = 0;
+		for (FileActionThread t : preparedThreads) {
 			if (!t.hasErrors()) {
 				t.start();
-				startedThreads.add(t);				
+				new ProgressThread(i, t).start();
+				startedThreads.add(t);
 			}
+			i++;
 		}
+
+		preparedThreads = null;
 		return startedThreads;
+	}
+
+	private class ProgressThread extends Thread {
+		private int index;
+		private FileActionThread t;
+
+		public ProgressThread(int index, FileActionThread t) {
+			this.index = index;
+			this.t = t;
+		}
+		
+		@Override
+		public void run() {
+			if (t.isAlive())
+				tableModel.setState(index, ProcessStatus.Running);
+			
+			while(t.isAlive()) {
+				double perc = t.getPercentage();
+				tableModel.setPercentage(index, perc);
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			
+			tableModel.setState(index, ProcessStatus.Completed);
+		}
 	}
 }

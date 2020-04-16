@@ -1,58 +1,33 @@
 package dev.blu.view;
 
 import java.awt.BorderLayout;
-import java.awt.EventQueue;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableModel;
-import javax.swing.JList;
 import javax.swing.JScrollPane;
-import javax.swing.SpringLayout;
 import javax.swing.JButton;
 import java.awt.Component;
 import javax.swing.Box;
 import javax.swing.SwingConstants;
 import java.awt.FlowLayout;
-import javax.swing.BoxLayout;
-import javax.swing.DefaultListModel;
-
 import java.awt.event.ActionListener;
 import java.awt.event.FocusListener;
-import java.awt.event.ItemListener;
-import java.beans.PropertyChangeListener;
-import java.io.File;
 import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.UUID;
-import java.util.Vector;
 import java.awt.event.ActionEvent;
 import java.awt.Dimension;
-import javax.swing.JLayeredPane;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFormattedTextField;
 import javax.swing.JTextField;
 import javax.swing.JLabel;
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.ColumnSpec;
-import com.jgoodies.forms.layout.RowSpec;
-
 import dev.blu.model.core.SplitConfiguration;
 import dev.blu.model.enums.ByteUnit;
-import dev.blu.model.enums.ProcessStatus;
-import dev.blu.model.output.FileTableModel;
 import dev.blu.view.enums.ActionType;
 
-import com.jgoodies.forms.layout.FormSpecs;
-import java.awt.GridLayout;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
 import net.miginfocom.swing.MigLayout;
 import javax.swing.JPasswordField;
 import java.awt.Font;

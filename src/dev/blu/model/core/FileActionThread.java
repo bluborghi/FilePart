@@ -39,4 +39,5 @@ public class FileActionThread extends Thread {
 		return (error!=null && !error.isEmpty())
 				|| fa==null;
 	}
+	
 }

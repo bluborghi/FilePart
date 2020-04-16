@@ -51,7 +51,7 @@ public class AppController {
 				File file = fc.getSelectedFile();
 				//System.out.println("Opening: " + file.getAbsolutePath());
 				UUID id = model.addFile(file);
-				//model.updateConfig(id, new SplitConfiguration(id, 3, 0, ByteUnit.B, "caccamelone".toCharArray(), "/run/media/blubo/Volume/FilePart/myFolder/mySecondOtherFolder"));
+				model.updateConfig(id, new SplitConfiguration(id, 3, 0, ByteUnit.B, "caccamelone".toCharArray(), "/run/media/blubo/Volume/FilePart/myFolder/mySecondOtherFolder"));
 			} else {
 				System.out.println("Open command cancelled by user.");
 			}
@@ -83,28 +83,28 @@ public class AppController {
 	    			System.err.print(t.getErrorMessage());
 	    	}
 	    	
-	    	Vector<FileActionThread> startedThreads = model.startThreads(threads);
+	    	Vector<FileActionThread> startedThreads = model.startThreads();
 	    	
 	    	
-	    	boolean running = true;
-	    	while (running) {
-	    		running = false;
-	    		for (FileActionThread t : startedThreads) {
-	    			if (t.isAlive()) {
-	    				running = true;
-	    			}
-	    			System.out.print(t.getFile().getName() + ": " + Math.floor(t.getPercentage()*10)/10 + " | ");
-	    		}    		
-	    		System.out.println();
-	    		try {
-					Thread.sleep(100);
-				} catch (InterruptedException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} 
-	    	}
-	    	
-	    	System.out.println("done");
+//	    	boolean running = true;
+//	    	while (running) {
+//	    		running = false;
+//	    		for (FileActionThread t : startedThreads) {
+//	    			if (t.isAlive()) {
+//	    				running = true;
+//	    			}
+//	    			System.out.print(t.getFile().getName() + ": " + Math.floor(t.getPercentage()*10)/10 + " | ");
+//	    		}    		
+//	    		System.out.println();
+//	    		try {
+//					Thread.sleep(100);
+//				} catch (InterruptedException e1) {
+//					// TODO Auto-generated catch block
+//					e1.printStackTrace();
+//				} 
+//	    	}
+//	    	
+//	    	System.out.println("done");
 			
 			
 //			Vector<SplitConfiguration> queue = view.getQueue();

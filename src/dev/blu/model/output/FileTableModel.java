@@ -11,17 +11,17 @@ import dev.blu.model.enums.ProcessStatus;
 
 public class FileTableModel extends AbstractTableModel {
 	private Vector<FileConfiguration> configs;
-	private String[] cols = {"Name","Status","%"};
-	
+	private String[] cols = { "Name", "Status", "%" };
+
 	public FileTableModel() {
-		configs = new Vector<FileConfiguration>(0,5);
+		configs = new Vector<FileConfiguration>(0, 5);
 	}
-	
+
 	@Override
 	public int getRowCount() {
 		return configs.size();
 	}
-	
+
 	@Override
 	public int getColumnCount() {
 		return cols.length;
@@ -38,40 +38,37 @@ public class FileTableModel extends AbstractTableModel {
 		if (columnIndex == 2) {
 			if (configs.get(rowIndex).getState() == ProcessStatus.Running) {
 				if (configs.get(rowIndex).getPercentage() != -1) {
-					return configs.get(rowIndex).getPercentage() + "%";					
+					return configs.get(rowIndex).getPercentage() + "%";
 				}
-			} else
-			if (configs.get(rowIndex).getState() == ProcessStatus.Completed) {	
-				return 100 + "%";					
-			} 
+			} else if (configs.get(rowIndex).getState() == ProcessStatus.Completed) {
+				return 100 + "%";
+			}
 			return "";
 		}
 		return null;
 	}
-	
+
 //	public void setValueAt(Object value, int row, int col) {
 //        data[row][col] = value;
 //        fireTableCellUpdated(row, col);
 //    }
-	
+
 	public String getColumnName(int col_index) {
-        return cols[col_index].toString();
-    }
+		return cols[col_index].toString();
+	}
 
 	public UUID addFile(File file, UUID id) {
 		FileConfiguration c = new FileConfiguration(file, id);
 		configs.add(c);
-		fireTableRowsInserted(getRowCount(),getRowCount());
+		fireTableRowsInserted(getRowCount(), getRowCount());
 		return id;
 	}
-	
-	
 
 	public int removeFile(UUID id) {
 		int index = getIndex(id);
 		return removeFileAt(index);
 	}
-	
+
 	public int removeFileAt(int index) {
 		try {
 			configs.remove(index);
@@ -81,7 +78,7 @@ public class FileTableModel extends AbstractTableModel {
 		}
 		return 0;
 	}
-	
+
 	public FileConfiguration getConfig(int index) {
 		return configs.get(index);
 	}
@@ -89,7 +86,7 @@ public class FileTableModel extends AbstractTableModel {
 	public FileConfiguration getConfig(UUID id) {
 		return getConfig(getIndex(id));
 	}
-	
+
 	public int getIndex(UUID id) {
 		int i = 0;
 		for (FileConfiguration fc : configs) {
@@ -102,63 +99,56 @@ public class FileTableModel extends AbstractTableModel {
 	}
 
 	public Vector<FileConfiguration> getConfigs() {
-		return configs;		
+		return configs;
 	}
 
-	
-	
-	
-	
-	
-	
-	/* OLD DEPRECATED STUFF
-	public void setProcessStatus(UUID id, ProcessStatus ps) {
-		int index = configIndexOf(id);
-		setProcessStatus(index, ps);
-	}
-	
-	public void setProcessStatus(int index, ProcessStatus ps) {
-		try {
-			configs.get(index).setState(ps);
-			fireTableRowsUpdated(index, index);
-		} catch (IndexOutOfBoundsException e) {
-			System.err.println("cant set index "+index+" because out of bounds (maybe exceeded states.size() = "+states.size()+")");
-		}
-	}
-	
-	public UUID getId(int index) {
-		try {
-			return configs.get(index);			
-		} catch (IndexOutOfBoundsException e) {
-			return null;
+	public void setPercentage(int index, double percentage) {
+		FileConfiguration fc = getConfig(index);
+		if (fc != null) {
+			System.out.println("setting percentage: "+percentage+" at index "+ index);
+			fc.setPercentage(percentage);
+			this.fireTableRowsUpdated(index, index);
 		}
 	}
 
-	public File getFile(int index) {
-		return files.get(index);
-	}
-	
-	public File getFile(UUID id) {
-		int index = ids.indexOf(id);
-		return getFile(index);
-	}
-	
-	public int getIndex(UUID id) {
-		return ids.indexOf(id);
-	}
-	
-	public ProcessStatus getProcessStatus(int index) {
-		return states.get(index);
+	public void setState(int index, ProcessStatus state) {
+		FileConfiguration fc = getConfig(index);
+		if (fc != null) {
+			fc.setState(state);
+			this.fireTableRowsUpdated(index, index);	
+		}
 	}
 
-	
+	/*
+	 * OLD DEPRECATED STUFF public void setProcessStatus(UUID id, ProcessStatus ps)
+	 * { int index = configIndexOf(id); setProcessStatus(index, ps); }
+	 * 
+	 * public void setProcessStatus(int index, ProcessStatus ps) { try {
+	 * configs.get(index).setState(ps); fireTableRowsUpdated(index, index); } catch
+	 * (IndexOutOfBoundsException e) { System.err.println("cant set index "
+	 * +index+" because out of bounds (maybe exceeded states.size() = "+states.size(
+	 * )+")"); } }
+	 * 
+	 * public UUID getId(int index) { try { return configs.get(index); } catch
+	 * (IndexOutOfBoundsException e) { return null; } }
+	 * 
+	 * public File getFile(int index) { return files.get(index); }
+	 * 
+	 * public File getFile(UUID id) { int index = ids.indexOf(id); return
+	 * getFile(index); }
+	 * 
+	 * public int getIndex(UUID id) { return ids.indexOf(id); }
+	 * 
+	 * public ProcessStatus getProcessStatus(int index) { return states.get(index);
+	 * }
+	 * 
+	 * 
+	 * 
+	 * public void setPercentage(UUID id, double percentage) { int index =
+	 * getIndex(id); //System.out.println("setting "+ percentages.get(index)+
+	 * " at index " + index + " => " + Math.round(percentage));
+	 * percentages.set(index, (int) Math.round(percentage));
+	 * fireTableRowsUpdated(index, index); }
+	 */
 
-	public void setPercentage(UUID id, double percentage) {
-		int index = getIndex(id);
-		//System.out.println("setting "+ percentages.get(index)+ " at index " + index + " => " + Math.round(percentage));
-		percentages.set(index, (int) Math.round(percentage));
-		fireTableRowsUpdated(index, index);
-	} */
-
-	
 }
