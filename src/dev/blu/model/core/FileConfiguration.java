@@ -12,16 +12,15 @@ public class FileConfiguration {
 	private ProcessStatus state;
 	private int percentage;
 	private SplitConfiguration splitConfig;
-	
-	public FileConfiguration(File file, UUID id, ProcessStatus state,
-			SplitConfiguration splitConfig) {
+
+	public FileConfiguration(File file, UUID id, ProcessStatus state, SplitConfiguration splitConfig) {
 		this.file = file;
 		this.id = id;
 		this.state = state;
 		this.percentage = 0;
 		this.splitConfig = splitConfig;
 	}
-	
+
 	public FileConfiguration(File file, UUID id) {
 		this.file = file;
 		this.id = id;
@@ -33,7 +32,7 @@ public class FileConfiguration {
 	public FileConfiguration(File file) {
 		this(file, UUID.randomUUID());
 	}
-	
+
 	public File getFile() {
 		return file;
 	}
@@ -55,7 +54,10 @@ public class FileConfiguration {
 	}
 
 	public void setPercentage(double percentage) {
-		setPercentage((int) Math.round(percentage));
+		if (Double.isInfinite(percentage))
+			setPercentage(100);
+		else
+			setPercentage((int) Math.round(percentage));
 	}
 
 	public void setPercentage(int percentage) {
@@ -69,6 +71,5 @@ public class FileConfiguration {
 	public void setSplitConfig(SplitConfiguration splitConfig) {
 		this.splitConfig = splitConfig;
 	}
-	
-	
+
 }
