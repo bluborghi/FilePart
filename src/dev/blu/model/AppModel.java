@@ -50,6 +50,10 @@ public class AppModel {
 	public FileTableModel getTableModel() {
 		return tableModel;
 	}
+	
+	public int getConfigsCount() {
+		return getTableModel().getConfigs().size();
+	}
 
 	public void updateConfig(UUID id, SplitConfiguration splitConfig) {
 		tableModel.getConfig(id).setSplitConfig(splitConfig);

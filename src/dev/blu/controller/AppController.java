@@ -51,7 +51,9 @@ public class AppController {
 				File file = fc.getSelectedFile();
 				//System.out.println("Opening: " + file.getAbsolutePath());
 				UUID id = model.addFile(file);
-				model.updateConfig(id, new SplitConfiguration(id, 3, 0, ByteUnit.B, "caccamelone".toCharArray(), "/run/media/blubo/Volume/FilePart/myFolder/mySecondOtherFolder"));
+				int index = model.getConfigsCount() -1;
+				view.selectRows(index, index);
+				//model.updateConfig(id, new SplitConfiguration(id, 3, 0, ByteUnit.B, "caccamelone".toCharArray(), "/run/media/blubo/Volume/FilePart/myFolder/mySecondOtherFolder"));
 			} else {
 				System.out.println("Open command cancelled by user.");
 			}
