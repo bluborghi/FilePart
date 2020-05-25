@@ -7,8 +7,12 @@ import java.util.UUID;
 import java.util.Vector;
 
 import javax.swing.JFileChooser;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
 import dev.blu.model.AppModel;
 import dev.blu.model.core.FileActionThread;
+import dev.blu.model.core.FileConfiguration;
 import dev.blu.model.core.SplitConfiguration;
 import dev.blu.model.enums.ByteUnit;
 import dev.blu.view.AppView;
@@ -26,7 +30,7 @@ public class AppController {
 		view.addAddButtonActionListener(new AddButtonActionListener());
 		view.addRemoveButtonActionListener(new RemoveButtonActionListener());
 		view.addStartButtonActionListener(new StartButtonActionListener());
-//		view.setFileListSelectionListener(new FileListSelectionListener());
+		view.addFileListSelectionListener(new FileListSelectionListener());
 //		view.setFocusListener(new DetailsPanelFocusListener());
 //		view.addSplitOptionsItemListener(new SplitOptionItemListener());
 		view.setVisible(true);
@@ -68,8 +72,29 @@ public class AppController {
 			int file_index = view.getSelectedInedex();
 			if (file_index != -1) {
 				model.removeFileAt(file_index);
+				int count = model.getConfigsCount();
+				if(count>0) {//if there are elements left
+					if (file_index < count) {
+						view.selectRows(file_index, file_index);		
+					}
+					else {
+						view.selectRows(count -1, count -1);	
+					}
+				}
 			}
 		}
+	}
+
+
+	class FileListSelectionListener implements ListSelectionListener {
+	
+		@Override
+		public void valueChanged(ListSelectionEvent e) {
+			int index = view.getSelectedIndex();
+			FileConfiguration fc = model.getTableModel().getConfig(index);
+			//set view side panel with fc data
+		}
+	
 	}
 
 	class StartButtonActionListener implements ActionListener {
