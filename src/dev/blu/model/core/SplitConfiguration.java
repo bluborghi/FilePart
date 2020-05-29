@@ -24,7 +24,7 @@ public class SplitConfiguration {
 	}
 	
 	public SplitConfiguration(UUID id) {
-		this(id, -1, -1, ByteUnit.MiB, null , "");
+		this(id, 0, 0, ByteUnit.MiB, new char[0] , "");
 	}
 	
 	public long getPartNumber() {

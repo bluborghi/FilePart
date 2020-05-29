@@ -80,6 +80,7 @@ public class FileTableModel extends AbstractTableModel {
 	}
 
 	public FileConfiguration getConfig(int index) {
+		if (index < 0 || index >= configs.size()) return null;
 		return configs.get(index);
 	}
 

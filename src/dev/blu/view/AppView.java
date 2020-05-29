@@ -159,7 +159,7 @@ public class AppView extends JFrame {
 		fileChooser = new JFileChooser();
 		configs = new HashMap<UUID, SplitConfiguration>();
 	}
-
+	
 	public JFileChooser getFileChooser() {
 		return this.fileChooser;
 	}
@@ -235,10 +235,6 @@ public class AppView extends JFrame {
 
 	public void showStatus(String status) {
 		lblStatus.setText(status);
-	}
-
-	public int getSelectedInedex() {
-		return fileList.getSelectedRow();
 	}
 	
 	private SplitConfiguration getConfigById(UUID id) {
@@ -330,5 +326,45 @@ public class AppView extends JFrame {
 //	public void addSplitOptionsItemListener(ItemListener itemListener) {
 //		actionTypes.addItemListener(itemListener);
 //	}
+	
+	
+	
+	/*
+	 * public ActionType getActionType() { return
+	 * actionTypes.getItemAt(actionTypes.getSelectedIndex()); }
+	 * 
+	 * public long getPartSize() { return Long.parseLong(txtSize.getText()); }
+	 * 
+	 * public int getPartsNumber() { return Integer.parseInt(txtParts.getText()); }
+	 * 
+	 * public char[] getPassword() { return passwordField.getPassword(); }
+	 * 
+	 * public String getOutputDir() { return txtOutputDir.getText(); }
+	 */
 
+	public JComboBox<ActionType> getActionTypes() {
+		return actionTypes;
+	}
+
+	public JFormattedTextField getTxtSize() {
+		return txtSize;
+	}
+
+	public JFormattedTextField getTxtParts() {
+		return txtParts;
+	}
+
+	public JPasswordField getPasswordField() {
+		return passwordField;
+	}
+
+	public JTextField getTxtOutputDir() {
+		return txtOutputDir;
+	}
+
+	public JComboBox<ByteUnit> getUnitSelector() {
+		return unitSelector;
+	}
+	
+	
 }
