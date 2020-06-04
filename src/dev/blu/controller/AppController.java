@@ -4,7 +4,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.text.ParseException;
 import java.util.UUID;
 import java.util.Vector;
 
@@ -28,10 +31,12 @@ import dev.blu.view.enums.ActionType;
 public class AppController {
 	private AppView view;
 	private AppModel model;
-
+	private int lastIndex; 
+	
 	public AppController(AppModel m, AppView v) {
 		setView(v);
 		setModel(m);
+		setLastIndex(-1);
 		
 		view.setTableModel(model.getTableModel());
 		
@@ -40,6 +45,7 @@ public class AppController {
 		view.addStartButtonActionListener(new StartButtonActionListener());
 		view.addFileListSelectionListener(new FileListSelectionListener());
 		view.addDetailsPanelFocusListener(new DetailsPanelFocusListener());
+		view.addDetailsPanelPropertyChangeListener(new DetailsPanelPropertyChangeListener());
 //		view.addSplitOptionsItemListener(new SplitOptionItemListener());
 		view.setVisible(true);
 	}
@@ -52,21 +58,61 @@ public class AppController {
 		this.model = model;
 	}
 	
-	private void getSidePanel() {
-		int index = view.getSelectedIndex();
+	private int getLastIndex() {
+		return lastIndex;
+	}
+
+	private void setLastIndex(int lastIndex) {
+		this.lastIndex = lastIndex;
+	}
+
+	private void saveDetailsPanel(int index) {
+		if (index == -1) {
+			index = getLastIndex();
+			if (index == -1)
+				return;
+		}
 		FileConfiguration fc = model.getTableModel().getConfig(index);
 		if (fc == null) // no file selected
 			return;
 
+		SplitConfiguration current = fc.getSplitConfig();
+		
 		JComboBox<ActionType> actionTypes = view.getActionTypes();
 		JComboBox<ByteUnit> unitSelector = view.getUnitSelector();
+		
+		long partSize = current.getPartSize();
 		JFormattedTextField txtSize = view.getTxtSize();
+		try {
+			txtSize.commitEdit();
+			if (txtSize.getValue() != null) { //bug workaround, getValue() changes its return type randomly
+				Class c = txtSize.getValue().getClass();
+//				System.out.println(c);
+				if (c.equals(Long.class))
+					partSize = (long) txtSize.getValue();
+				else if (c.equals(Integer.class))
+					partSize = ((int) txtSize.getValue());
+			}
+		} catch (ParseException e) {
+			partSize = 0;
+		}
+		
+		int partNumber = current.getPartNumber();
 		JFormattedTextField txtParts = view.getTxtParts();
+		try {
+			txtParts.commitEdit();
+			if (txtParts.getValue() != null) {
+				partNumber = (int) txtParts.getValue();
+			}
+		} catch (ParseException e) {
+			partNumber = 0;
+		}
+		
 		JTextField txtOutputDir = view.getTxtOutputDir();
 		JPasswordField passwordField = view.getPasswordField();
 		
-		int partNumber = Integer.parseInt(txtParts.getText());
-		long partSize = Long.parseLong(txtSize.getText());
+		
+		
 		ByteUnit byteUnit = (ByteUnit) unitSelector.getSelectedItem();
 		char[] password = passwordField.getPassword();
 		String outputDir = txtOutputDir.getText();
@@ -75,13 +121,13 @@ public class AppController {
 		model.updateConfig(fc.getId(), sc);
 	}
 	
-	private void setSidePanel(FileConfiguration fc) {
+	private void loadDetailsPanel(FileConfiguration fc) {
 		JComboBox<ActionType> actionTypes = view.getActionTypes();
 		JFormattedTextField txtSize = view.getTxtSize();
 		JFormattedTextField txtParts = view.getTxtParts();
 		JTextField txtOutputDir = view.getTxtOutputDir();
 		JPasswordField passwordField = view.getPasswordField();
-	
+		
 		initActionTypes(actionTypes);
 		String ext = FileHelper.getFileExtension(fc.getFile().getName());
 		
@@ -95,8 +141,8 @@ public class AppController {
 			sc = new SplitConfiguration( fc.getId() );
 			model.updateConfig(fc.getId(), sc);
 		}
-		txtSize.setText(""+sc.getPartSize());
-		txtParts.setText(""+sc.getPartNumber());
+		txtSize.setValue(sc.getPartSize());
+		txtParts.setValue(sc.getPartNumber());
 		txtOutputDir.setText(sc.getOutputDir());
 		passwordField.setText(new String(sc.getPw()));			
 	}
@@ -125,7 +171,7 @@ public class AppController {
 				view.selectRows(index, index);
 				//model.updateConfig(id, new SplitConfiguration(id, 3, 0, ByteUnit.B, "caccamelone".toCharArray(), "/run/media/blubo/Volume/FilePart/myFolder/mySecondOtherFolder"));
 			} else {
-				System.out.println("Open command cancelled by user.");
+				//System.out.println("Open command cancelled by user.");
 			}
 		}
 	}
@@ -137,15 +183,20 @@ public class AppController {
 			
 			int file_index = view.getSelectedIndex();
 			if (file_index != -1) {
+//				System.out.println(model.getTableModel().getConfig(file_index).getSplitConfig().getPartSize());
 				model.removeFileAt(file_index);
+//				System.out.println(model.getTableModel().getConfig(file_index).getSplitConfig().getPartSize());
 				int count = model.getConfigsCount();
 				if(count>0) {//if there are elements left
 					if (file_index < count) {
-						view.selectRows(file_index, file_index);		
+						view.selectRows(file_index, file_index);
 					}
 					else {
 						view.selectRows(count -1, count -1);	
 					}
+				}
+				else {
+					setLastIndex(-1);
 				}
 			}
 		}
@@ -156,10 +207,18 @@ public class AppController {
 		
 		@Override
 		public void valueChanged(ListSelectionEvent e) {
+			int lastIndex = getLastIndex();
 			int index = view.getSelectedIndex();
-			if (index != -1) {
+			if (index != -1) { //if this selection is valid, save the previous selection and load new data
+				if (lastIndex != -1) { //if last selection was null, don't save its data
+					saveDetailsPanel(lastIndex); 
+				}
+				setLastIndex(index);
 				FileConfiguration fc = model.getTableModel().getConfig(index);
-				setSidePanel(fc);				
+				loadDetailsPanel(fc);				
+			}
+			else { //if this selection is null, don't save data next time
+				setLastIndex(index);
 			}
 		}
 
@@ -175,10 +234,21 @@ public class AppController {
 
 		@Override
 		public void focusLost(FocusEvent e) {
-			//getSidePanel();
+			saveDetailsPanel(view.getSelectedIndex());
 		}
 
 	
+	}
+	
+	class DetailsPanelPropertyChangeListener implements PropertyChangeListener {
+
+		@Override
+		public void propertyChange(PropertyChangeEvent evt) {
+//			System.out.println("val: "+evt.getNewValue());
+//			if (view.getSelectedIndex() != -1)
+//				saveSidePanel(view.getSelectedIndex());
+		}
+		
 	}
 
 	class StartButtonActionListener implements ActionListener {

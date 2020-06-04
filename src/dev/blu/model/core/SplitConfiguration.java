@@ -6,7 +6,7 @@ import java.util.UUID;
 import dev.blu.model.enums.ByteUnit;
 
 public class SplitConfiguration {
-	private long partNumber;
+	private int partNumber;
 	private long partSize;
 	private ByteUnit unit;
 	private char[] pw;
@@ -27,11 +27,11 @@ public class SplitConfiguration {
 		this(id, 0, 0, ByteUnit.MiB, new char[0] , "");
 	}
 	
-	public long getPartNumber() {
+	public int getPartNumber() {
 		return partNumber;
 	}
 
-	public void setPartNumber(long partNumber) {
+	public void setPartNumber(int partNumber) {
 		this.partNumber = partNumber;
 	}
 

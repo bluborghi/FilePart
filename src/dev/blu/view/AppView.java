@@ -6,6 +6,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableModel;
+import javax.swing.text.NumberFormatter;
 import javax.swing.JScrollPane;
 import javax.swing.JButton;
 import java.awt.Component;
@@ -14,6 +15,7 @@ import javax.swing.SwingConstants;
 import java.awt.FlowLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusListener;
+import java.beans.PropertyChangeListener;
 import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.UUID;
@@ -94,7 +96,14 @@ public class AppView extends JFrame {
 		Component horizontalGlue_1 = Box.createHorizontalGlue();
 		detailsPanel.add(horizontalGlue_1, "cell 0 1");
 
-		txtSize = new JFormattedTextField(NumberFormat.getInstance());
+
+		NumberFormatter intFormatter = new NumberFormatter(NumberFormat.getInstance());
+		intFormatter.setValueClass(Integer.class);
+		intFormatter.setMinimum(0);
+		intFormatter.setMaximum(Integer.MAX_VALUE);
+		intFormatter.setAllowsInvalid(true);
+		
+		txtSize = new JFormattedTextField(intFormatter);
 		detailsPanel.add(txtSize, "cell 0 1,growx,aligny center");
 		txtSize.setColumns(10);
 
@@ -108,7 +117,7 @@ public class AppView extends JFrame {
 		JLabel lblPartNumber = new JLabel("# of parts:");
 		detailsPanel.add(lblPartNumber, "flowx,cell 0 2,alignx left");
 
-		txtParts = new JFormattedTextField(NumberFormat.getInstance());
+		txtParts = new JFormattedTextField(intFormatter);
 		detailsPanel.add(txtParts, "cell 0 2,growx,aligny center");
 		txtParts.setColumns(10);
 
@@ -186,7 +195,11 @@ public class AppView extends JFrame {
 			c.addFocusListener(fl);
 		}
 	}
-	
+	public void addDetailsPanelPropertyChangeListener(PropertyChangeListener pcl) {
+		txtParts.addPropertyChangeListener("value", pcl);
+		txtSize.addPropertyChangeListener("value", pcl);
+		txtOutputDir.addPropertyChangeListener("text", pcl);
+	}
 	
 	public void setTableModel(TableModel m) {
 		fileList.setModel(m);
@@ -365,6 +378,6 @@ public class AppView extends JFrame {
 	public JComboBox<ByteUnit> getUnitSelector() {
 		return unitSelector;
 	}
-	
+
 	
 }
