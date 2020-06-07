@@ -5,6 +5,7 @@ import javax.crypto.BadPaddingException;
 
 import dev.blu.controller.AppController;
 import dev.blu.model.AppModel;
+import dev.blu.model.GUI.GUIModel;
 import dev.blu.model.core.FileActionThread;
 import dev.blu.model.core.FileCipher;
 import dev.blu.model.core.SplitConfiguration;
@@ -72,7 +73,7 @@ public class Main {
 
     	
     	
-    	AppModel model = new AppModel();
+    	GUIModel model = new GUIModel();
     	AppView view = new AppView();
     	AppController controller = new AppController(model,view);
     	

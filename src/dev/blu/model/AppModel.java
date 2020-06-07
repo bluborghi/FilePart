@@ -1,16 +1,12 @@
 package dev.blu.model;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.util.Set;
 import java.util.UUID;
 import java.util.Vector;
 
 import dev.blu.model.core.FileActionThread;
 import dev.blu.model.core.FileConfiguration;
-import dev.blu.model.core.FileDecryptor;
 import dev.blu.model.core.FileEncryptAndSplit;
-import dev.blu.model.core.FileEncryptor;
 import dev.blu.model.core.FileMergeAndDecrypt;
 import dev.blu.model.core.FileMerger;
 import dev.blu.model.core.FileSplitterByMaxSize;
@@ -18,55 +14,78 @@ import dev.blu.model.core.FileSplitterByPartNumber;
 import dev.blu.model.core.SplitConfiguration;
 import dev.blu.model.enums.ProcessStatus;
 import dev.blu.model.interfaces.FileAction;
-import dev.blu.model.output.FileTableModel;
 
 public class AppModel {
-	FileTableModel tableModel;
+	Vector<FileConfiguration> configs;
 	Vector<FileActionThread> preparedThreads;
 	Vector<FileConfiguration> preparedConfigs;
 
 	public AppModel() {
-		tableModel = new FileTableModel();
+		configs = new Vector<FileConfiguration>(0,5);
+	}
+	
+	protected Vector<FileConfiguration> getFileConfigs() {
+		return configs;
 	}
 
 	public UUID addFile(File file) {
 		UUID id = UUID.randomUUID();
-		tableModel.addFile(file, id);
+		FileConfiguration c = new FileConfiguration(file, id);
+		configs.add(c);		
 		return id;
 	}
 
 	public File removeFileAt(int index) {
-		File f = tableModel.getConfig(index).getFile();
-		if (tableModel.removeFileAt(index) == 0) {
-			return f; // return removed file
+		File f = getFileConfigAt(index).getFile();
+		
+		try {
+			configs.remove(index);
+		} catch (ArrayIndexOutOfBoundsException e) {
+			return null;  // if no file was found
 		}
-		return null; // if no file was found
+		return f;  // returns removed file
+	}
+
+	public FileConfiguration getFileConfigAt(int index) {
+		if (index < 0 || configs==null || index >= configs.size()) return null;
+		return configs.get(index);	
+	}
+	
+	public FileConfiguration getFileConfig(UUID id) {
+		return getFileConfigAt(getFileConfigIndex(id));
 	}
 
 	public File removeFile(UUID id) {
-		return removeFileAt(tableModel.getIndex(id));
-	}
-
-	public FileTableModel getTableModel() {
-		return tableModel;
+		return removeFileAt(getFileConfigIndex(id));
 	}
 	
+	public int getFileConfigIndex(UUID id) {
+		int i = 0;
+		for (FileConfiguration fc : configs) {
+			if (fc.getId().equals(id)) {
+				return i;
+			}
+			i++;
+		}
+		return -1;
+	}	
+	
 	public int getConfigsCount() {
-		return getTableModel().getConfigs().size();
+		return configs.size();
 	}
 
 	public void updateConfig(UUID id, SplitConfiguration splitConfig) {
-		tableModel.getConfig(id).setSplitConfig(splitConfig);
+		getFileConfig(id).setSplitConfig(splitConfig);
 	}
 
 	public SplitConfiguration getConfig(UUID id) {
-		return tableModel.getConfig(id).getSplitConfig();
+		return getFileConfig(id).getSplitConfig();
 	}
 
 	public Vector<FileActionThread> prepareThreads() {
 		preparedThreads = new Vector<FileActionThread>(0, 5);
 		preparedConfigs = new Vector<FileConfiguration>(0, 5);
-		for (FileConfiguration conf : tableModel.getConfigs()) {
+		for (FileConfiguration conf : configs) {
 			String err = "";
 			if (conf.getState() == ProcessStatus.Ready) {
 				SplitConfiguration params = conf.getSplitConfig();
@@ -137,19 +156,26 @@ public class AppModel {
 		@Override
 		public void run() {
 			if (t.isAlive())
-				tableModel.setState(index, ProcessStatus.Running);
+				setState(index,ProcessStatus.Running);
 			
 			while(t.isAlive()) {
 				double perc = t.getPercentage();
-				tableModel.setPercentage(index, perc);
+				setPercentage(index, perc);
 				try {
 					Thread.sleep(100);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 			}
-			
-			tableModel.setState(index, ProcessStatus.Completed);
+			setState(index,ProcessStatus.Completed);
 		}
+	}
+	
+	protected void setPercentage(int index, double perc) {
+		getFileConfigAt(index).setPercentage(perc);
+	}
+	
+	protected void setState(int index, ProcessStatus state) {
+		getFileConfigAt(index).setState(state);
 	}
 }

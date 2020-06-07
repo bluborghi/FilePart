@@ -26,10 +26,10 @@ import javax.swing.JFileChooser;
 import javax.swing.JFormattedTextField;
 import javax.swing.JTextField;
 import javax.swing.JLabel;
+
+import dev.blu.model.GUI.enums.ActionType;
 import dev.blu.model.core.SplitConfiguration;
 import dev.blu.model.enums.ByteUnit;
-import dev.blu.view.enums.ActionType;
-
 import net.miginfocom.swing.MigLayout;
 import javax.swing.JPasswordField;
 import java.awt.Font;

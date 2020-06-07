@@ -20,20 +20,21 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import dev.blu.model.AppModel;
+import dev.blu.model.GUI.GUIModel;
+import dev.blu.model.GUI.enums.ActionType;
 import dev.blu.model.core.FileActionThread;
 import dev.blu.model.core.FileConfiguration;
 import dev.blu.model.core.SplitConfiguration;
 import dev.blu.model.enums.ByteUnit;
 import dev.blu.model.helpers.FileHelper;
 import dev.blu.view.AppView;
-import dev.blu.view.enums.ActionType;
 
 public class AppController {
 	private AppView view;
-	private AppModel model;
+	private GUIModel model;
 	private int lastIndex; 
 	
-	public AppController(AppModel m, AppView v) {
+	public AppController(GUIModel m, AppView v) {
 		setView(v);
 		setModel(m);
 		setLastIndex(-1);
@@ -54,7 +55,7 @@ public class AppController {
 		this.view = view;
 	}	
 
-	private void setModel(AppModel model) {
+	private void setModel(GUIModel model) {
 		this.model = model;
 	}
 	
@@ -72,7 +73,7 @@ public class AppController {
 			if (index == -1)
 				return;
 		}
-		FileConfiguration fc = model.getTableModel().getConfig(index);
+		FileConfiguration fc = model.getFileConfigAt(index);
 		if (fc == null) // no file selected
 			return;
 
@@ -169,7 +170,7 @@ public class AppController {
 				UUID id = model.addFile(file);
 				int index = model.getConfigsCount() -1;
 				view.selectRows(index, index);
-				//model.updateConfig(id, new SplitConfiguration(id, 3, 0, ByteUnit.B, "caccamelone".toCharArray(), "/run/media/blubo/Volume/FilePart/myFolder/mySecondOtherFolder"));
+				//model.updateConfig(id, new SplitConfiguration(id, 3, 0, ByteUnit.B, "password".toCharArray(), "/run/media/blubo/Volume/FilePart/myFolder/mySecondOtherFolder"));
 			} else {
 				//System.out.println("Open command cancelled by user.");
 			}
@@ -214,7 +215,7 @@ public class AppController {
 					saveDetailsPanel(lastIndex); 
 				}
 				setLastIndex(index);
-				FileConfiguration fc = model.getTableModel().getConfig(index);
+				FileConfiguration fc = model.getFileConfigAt(index);
 				loadDetailsPanel(fc);				
 			}
 			else { //if this selection is null, don't save data next time

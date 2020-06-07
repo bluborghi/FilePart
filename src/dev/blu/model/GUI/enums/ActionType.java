@@ -1,4 +1,4 @@
-package dev.blu.view.enums;
+package dev.blu.model.GUI.enums;
 
 public enum ActionType {
 	Split,
