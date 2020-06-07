@@ -49,6 +49,9 @@ public class AppController {
 		view.addDetailsPanelFocusListener(new DetailsPanelFocusListener());
 		view.addDetailsPanelPropertyChangeListener(new DetailsPanelPropertyChangeListener());
 //		view.addSplitOptionsItemListener(new SplitOptionItemListener());
+		
+		initActionTypes(view.getActionTypes());
+
 		view.setVisible(true);
 	}
 
@@ -114,9 +117,7 @@ public class AppController {
 		}
 		
 		JTextField txtOutputDir = view.getTxtOutputDir();
-		JPasswordField passwordField = view.getPasswordField();
-		
-		
+		JPasswordField passwordField = view.getPasswordField();		
 		
 		ByteUnit byteUnit = (ByteUnit) unitSelector.getSelectedItem();
 		char[] password = passwordField.getPassword();
@@ -137,14 +138,15 @@ public class AppController {
 		}
 		
 		JComboBox<ActionType> actionTypes = view.getActionTypes();
-		initActionTypes(actionTypes);
 		JFormattedTextField txtSize = view.getTxtSize();
+		JComboBox<ByteUnit> unitSel = view.getUnitSelector();
 		JFormattedTextField txtParts = view.getTxtParts();
 		JTextField txtOutputDir = view.getTxtOutputDir();
 		JPasswordField passwordField = view.getPasswordField();
 		
 		actionTypes.setSelectedItem(dpc.getActionType());
 		txtSize.setValue(sc.getPartSize());
+		unitSel.setSelectedItem(sc.getUnit());
 		txtParts.setValue(sc.getPartNumber());
 		txtOutputDir.setText(sc.getOutputDir());
 		passwordField.setText(new String(sc.getPw()));			
