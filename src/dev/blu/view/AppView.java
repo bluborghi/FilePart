@@ -86,8 +86,6 @@ public class AppView extends JFrame {
 		detailsPanel.setLayout(new MigLayout("", "[240px,grow]", "[][24px][][24px][]"));
 
 		actionTypes = new JComboBox<ActionType>();
-		actionTypes.addItem(ActionType.Split);
-		actionTypes.addItem(ActionType.Merge);
 		detailsPanel.add(actionTypes, "flowx,cell 0 0,alignx left");
 
 		JLabel lblPartSize = new JLabel("Part Size:");

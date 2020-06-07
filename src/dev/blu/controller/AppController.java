@@ -20,6 +20,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import dev.blu.model.AppModel;
+import dev.blu.model.GUI.DetailsPanelOptions;
 import dev.blu.model.GUI.GUIModel;
 import dev.blu.model.GUI.enums.ActionType;
 import dev.blu.model.core.FileActionThread;
@@ -80,6 +81,9 @@ public class AppController {
 		SplitConfiguration current = fc.getSplitConfig();
 		
 		JComboBox<ActionType> actionTypes = view.getActionTypes();
+		model.getSidePanelAt(index).setActionType((ActionType) actionTypes.getSelectedItem());
+		
+		
 		JComboBox<ByteUnit> unitSelector = view.getUnitSelector();
 		
 		long partSize = current.getPartSize();
@@ -122,26 +126,24 @@ public class AppController {
 		model.updateConfig(fc.getId(), sc);
 	}
 	
-	private void loadDetailsPanel(FileConfiguration fc) {
-		JComboBox<ActionType> actionTypes = view.getActionTypes();
-		JFormattedTextField txtSize = view.getTxtSize();
-		JFormattedTextField txtParts = view.getTxtParts();
-		JTextField txtOutputDir = view.getTxtOutputDir();
-		JPasswordField passwordField = view.getPasswordField();
+	private void loadDetailsPanel(int index) {
+		DetailsPanelOptions dpc = model.getSidePanelAt(index);
 		
-		initActionTypes(actionTypes);
-		String ext = FileHelper.getFileExtension(fc.getFile().getName());
-		
-		if (ext.matches("\\d+")) { // es: 001
-			actionTypes.setSelectedItem(ActionType.Merge);
-		} else {
-			actionTypes.setSelectedItem(ActionType.Split);
-		}
+		FileConfiguration fc = model.getFileConfigAt(index);
 		SplitConfiguration sc = fc.getSplitConfig();
 		if (sc == null) {
 			sc = new SplitConfiguration( fc.getId() );
 			model.updateConfig(fc.getId(), sc);
 		}
+		
+		JComboBox<ActionType> actionTypes = view.getActionTypes();
+		initActionTypes(actionTypes);
+		JFormattedTextField txtSize = view.getTxtSize();
+		JFormattedTextField txtParts = view.getTxtParts();
+		JTextField txtOutputDir = view.getTxtOutputDir();
+		JPasswordField passwordField = view.getPasswordField();
+		
+		actionTypes.setSelectedItem(dpc.getActionType());
 		txtSize.setValue(sc.getPartSize());
 		txtParts.setValue(sc.getPartNumber());
 		txtOutputDir.setText(sc.getOutputDir());
@@ -150,9 +152,9 @@ public class AppController {
 
 	private void initActionTypes(JComboBox<ActionType> actionTypes) {
 		if (actionTypes.getItemCount() == 0) {
-			actionTypes.addItem(ActionType.Split);
+			actionTypes.addItem(ActionType.SplitByMaxSize);
+			actionTypes.addItem(ActionType.SplitByNumberOfParts);
 			actionTypes.addItem(ActionType.Merge);
-			actionTypes.setSelectedIndex(0);
 		}
 	}
 
@@ -215,8 +217,7 @@ public class AppController {
 					saveDetailsPanel(lastIndex); 
 				}
 				setLastIndex(index);
-				FileConfiguration fc = model.getFileConfigAt(index);
-				loadDetailsPanel(fc);				
+				loadDetailsPanel(index);				
 			}
 			else { //if this selection is null, don't save data next time
 				setLastIndex(index);
