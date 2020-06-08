@@ -42,6 +42,7 @@ public class AppController {
 		
 		view.setTableModel(model.getTableModel());
 		
+		view.addDirButtonActionListener(new DirButtonActionListener());
 		view.addAddButtonActionListener(new AddButtonActionListener());
 		view.addRemoveButtonActionListener(new RemoveButtonActionListener());
 		view.addStartButtonActionListener(new StartButtonActionListener());
@@ -160,12 +161,30 @@ public class AppController {
 		}
 	}
 
+	class DirButtonActionListener implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			//System.out.println("add action performed");
+			JFileChooser fc = view.getFileChooser();
+			fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+			int returnVal = fc.showOpenDialog(view);
+
+			if (returnVal == JFileChooser.APPROVE_OPTION) {
+				File file = fc.getSelectedFile();
+				//System.out.println("Opening: " + file.getAbsolutePath());
+				view.getTxtOutputDir().setText(file.getPath());
+			} else {
+				//System.out.println("Open command cancelled by user.");
+			}
+		}
+	}
 
 	class AddButtonActionListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			//System.out.println("add action performed");
 			JFileChooser fc = view.getFileChooser();
+			fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
 			int returnVal = fc.showOpenDialog(view);
 
 			if (returnVal == JFileChooser.APPROVE_OPTION) {

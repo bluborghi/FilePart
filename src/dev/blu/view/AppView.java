@@ -6,6 +6,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableModel;
+import javax.swing.text.JTextComponent;
 import javax.swing.text.NumberFormatter;
 import javax.swing.JScrollPane;
 import javax.swing.JButton;
@@ -46,6 +47,7 @@ public class AppView extends JFrame {
 	private JPasswordField passwordField;
 	private JTextField txtOutputDir;
 	private JFileChooser fileChooser;
+	private JButton dirButton;
 	private JButton addButton;
 	private JButton removeButton;
 	private JButton startButton;
@@ -135,7 +137,7 @@ public class AppView extends JFrame {
 		detailsPanel.add(txtOutputDir, "cell 0 4,growx");
 		txtOutputDir.setColumns(10);
 
-		JButton dirButton = new JButton("...");
+		dirButton = new JButton("...");
 		dirButton.setPreferredSize(new Dimension(40, 19));
 		detailsPanel.add(dirButton, "cell 0 4,alignx right");
 		addButton.addActionListener(new ActionListener() {
@@ -182,6 +184,10 @@ public class AppView extends JFrame {
 
 	public void addStartButtonActionListener(ActionListener buttonActionListener) {
 		startButton.addActionListener(buttonActionListener);
+	}
+	
+	public void addDirButtonActionListener(ActionListener buttonActionListener) {
+		dirButton.addActionListener(buttonActionListener);
 	}
 
 	public void addFileListSelectionListener(ListSelectionListener listSelectionListener) {
@@ -376,6 +382,5 @@ public class AppView extends JFrame {
 	public JComboBox<ByteUnit> getUnitSelector() {
 		return unitSelector;
 	}
-
 	
 }
