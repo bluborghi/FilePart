@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableModel;
 import javax.swing.text.JTextComponent;
@@ -16,6 +17,7 @@ import javax.swing.SwingConstants;
 import java.awt.FlowLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusListener;
+import java.awt.event.ItemListener;
 import java.beans.PropertyChangeListener;
 import java.text.NumberFormat;
 import java.util.HashMap;
@@ -199,10 +201,9 @@ public class AppView extends JFrame {
 			c.addFocusListener(fl);
 		}
 	}
-	public void addDetailsPanelPropertyChangeListener(PropertyChangeListener pcl) {
-		txtParts.addPropertyChangeListener("value", pcl);
-		txtSize.addPropertyChangeListener("value", pcl);
-		txtOutputDir.addPropertyChangeListener("text", pcl);
+	
+	public void addActionTypeItemListener(ItemListener itemListener) {
+		actionTypes.addItemListener(itemListener);
 	}
 	
 	public void setTableModel(TableModel m) {
@@ -382,5 +383,7 @@ public class AppView extends JFrame {
 	public JComboBox<ByteUnit> getUnitSelector() {
 		return unitSelector;
 	}
+
+	
 	
 }

@@ -4,6 +4,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -48,7 +50,8 @@ public class AppController {
 		view.addStartButtonActionListener(new StartButtonActionListener());
 		view.addFileListSelectionListener(new FileListSelectionListener());
 		view.addDetailsPanelFocusListener(new DetailsPanelFocusListener());
-		view.addDetailsPanelPropertyChangeListener(new DetailsPanelPropertyChangeListener());
+		view.addActionTypeItemListener(new ActionTypeItemListener());
+//		view.addDetailsPanelPropertyChangeListener(new DetailsPanelPropertyChangeListener());
 //		view.addSplitOptionsItemListener(new SplitOptionItemListener());
 		
 		initActionTypes(view.getActionTypes());
@@ -263,16 +266,40 @@ public class AppController {
 	
 	}
 	
-	class DetailsPanelPropertyChangeListener implements PropertyChangeListener {
+	class ActionTypeItemListener implements ItemListener{
+	    @Override
+	    public void itemStateChanged(ItemEvent event) {
+	       if (event.getStateChange() == ItemEvent.SELECTED) {
+	          ActionType action = (ActionType) event.getItem();
+//	          System.out.println("Action type changed, current: "+action);
+	          disableUnnecessaryFields(action);
+	       }
+	    }
 
-		@Override
-		public void propertyChange(PropertyChangeEvent evt) {
-//			System.out.println("val: "+evt.getNewValue());
-//			if (view.getSelectedIndex() != -1)
-//				saveSidePanel(view.getSelectedIndex());
-		}
-		
 	}
+
+	private void disableUnnecessaryFields(ActionType action) {
+		switch (action) {
+		case SplitByMaxSize:{
+			view.getTxtSize().setEnabled(true);
+			view.getUnitSelector().setEnabled(true);
+			view.getTxtParts().setEnabled(false);
+			break;
+		}
+		case SplitByNumberOfParts:{
+			view.getTxtSize().setEnabled(false);
+			view.getUnitSelector().setEnabled(false);
+			view.getTxtParts().setEnabled(true);
+			break;
+		}
+		case Merge:{
+			view.getTxtSize().setEnabled(false);
+			view.getUnitSelector().setEnabled(false);
+			view.getTxtParts().setEnabled(false);
+			break;
+		}
+		}
+	}       
 
 	class StartButtonActionListener implements ActionListener {
 		@Override
