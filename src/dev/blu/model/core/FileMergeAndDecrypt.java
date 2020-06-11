@@ -3,6 +3,7 @@ package dev.blu.model.core;
 import java.io.File;
 import java.io.IOException;
 
+import dev.blu.model.enums.ProcessStatus;
 import dev.blu.model.interfaces.FileAction;
 
 public class FileMergeAndDecrypt implements FileAction {
@@ -10,6 +11,8 @@ public class FileMergeAndDecrypt implements FileAction {
 	private FileAction decrypt;
 	private File inputFile;
 	private File toDelete;
+	private ProcessStatus status;
+	private boolean stop = false;
 	
 	public FileMergeAndDecrypt(File inputFile, SplitConfiguration params) {
 		this.inputFile  = inputFile;
@@ -21,6 +24,7 @@ public class FileMergeAndDecrypt implements FileAction {
 		}
 		decrypt = new FileDecryptor(merge.getOutputFile(), params);
 		toDelete = merge.getOutputFile();
+		status = ProcessStatus.Ready;
 	}
 	
 	public FileMergeAndDecrypt(FileConfiguration conf) {
@@ -29,8 +33,15 @@ public class FileMergeAndDecrypt implements FileAction {
 
 	@Override
 	public void start() {
+		status = ProcessStatus.Running;
 		merge.start();
 		decrypt.start();
+		if (stop) {
+			status = ProcessStatus.Stopped;
+		}
+		else {
+			status = ProcessStatus.Completed;			
+		}
 	}
 
 	@Override
@@ -59,6 +70,23 @@ public class FileMergeAndDecrypt implements FileAction {
 	@Override
 	public void clear() {
 		toDelete.delete();
+	}
+
+	@Override
+	public void stopAction() {
+		status = ProcessStatus.Stopping;
+		stop = true;
+		if (merge.getActionStatus() == ProcessStatus.Running) {
+			merge.stopAction();
+		}
+		if (decrypt.getActionStatus() == ProcessStatus.Running) {
+			decrypt.stopAction();
+		}
+	}
+
+	@Override
+	public ProcessStatus getActionStatus() {
+		return status;
 	}
 
 }

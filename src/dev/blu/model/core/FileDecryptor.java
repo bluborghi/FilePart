@@ -11,12 +11,15 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
+import dev.blu.model.enums.ProcessStatus;
 import dev.blu.model.helpers.FileHelper;
 import dev.blu.model.interfaces.FileAction;
 
 public class FileDecryptor extends FileCipher implements FileAction {
 	private static final int MIN_PW_LENGTH = 8;
 	private char[] password;
+	private ProcessStatus status;
+	private boolean stop = false;
 	
 	public FileDecryptor(FileConfiguration config) {
 		super(
@@ -24,6 +27,7 @@ public class FileDecryptor extends FileCipher implements FileAction {
 				config.getSplitConfig().getOutputDir()
 			);
 		password = config.getSplitConfig().getPw();
+		status = ProcessStatus.Ready;
 	}
 	
 	public FileDecryptor(File inputFile, SplitConfiguration params) {
@@ -32,10 +36,12 @@ public class FileDecryptor extends FileCipher implements FileAction {
 				params.getOutputDir()
 			);
 		password = params.getPw();
+		status = ProcessStatus.Ready;
 	}
 
 	@Override
 	public void start() {
+		status = ProcessStatus.Running;
 		try {
 			super.Decrypt(password);
 		} catch (InvalidKeyException | NoSuchAlgorithmException | InvalidKeySpecException | NoSuchPaddingException
@@ -43,12 +49,16 @@ public class FileDecryptor extends FileCipher implements FileAction {
 				| IOException e) {
 			e.printStackTrace();
 		}
+		if (stop) {
+			status = ProcessStatus.Stopped;
+		}else {
+			status = ProcessStatus.Completed;			
+		}
 	}
 
 	@Override
 	public double getPercentage() {
 		return super.getPercentage();
-		//return 69; //nice, but not implemented
 	}
 
 	@Override
@@ -73,5 +83,17 @@ public class FileDecryptor extends FileCipher implements FileAction {
 	@Override
 	public void clear() {
 		//nothing to clear
+	}
+
+	@Override
+	public void stopAction() {
+		status = ProcessStatus.Stopping;
+		super.stopAction();
+		stop = true;
+	}
+
+	@Override
+	public ProcessStatus getActionStatus() {
+		return status;
 	}
 }

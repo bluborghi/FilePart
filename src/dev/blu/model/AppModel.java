@@ -19,6 +19,7 @@ public class AppModel {
 	Vector<FileConfiguration> configs;
 	Vector<FileActionThread> preparedThreads;
 	Vector<FileConfiguration> preparedConfigs;
+	Vector<FileActionThread> startedThreads;
 
 	public AppModel() {
 		configs = new Vector<FileConfiguration>(0,5);
@@ -129,7 +130,7 @@ public class AppModel {
 		if (preparedThreads == null || preparedConfigs == null)
 			return null;
 		
-		Vector<FileActionThread> startedThreads = new Vector<FileActionThread>(0, 5);
+		startedThreads = new Vector<FileActionThread>(0, 5);
 		int i = 0;
 		for (FileActionThread t : preparedThreads) {
 			if (!t.hasErrors()) {
@@ -142,6 +143,12 @@ public class AppModel {
 
 		preparedThreads = null;
 		return startedThreads;
+	}
+	
+	public void stopThreads() {
+		startedThreads.forEach((t) -> {
+			t.stopAction();
+		});
 	}
 
 	private class ProgressThread extends Thread {
@@ -178,4 +185,5 @@ public class AppModel {
 	protected void setState(int index, ProcessStatus state) {
 		getFileConfigAt(index).setState(state);
 	}
+
 }

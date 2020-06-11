@@ -3,6 +3,7 @@ package dev.blu.model.core;
 import java.io.File;
 import java.io.IOException;
 
+import dev.blu.model.enums.ProcessStatus;
 import dev.blu.model.interfaces.FileAction;
 
 public class FileEncryptAndSplit implements FileAction {
@@ -10,6 +11,8 @@ public class FileEncryptAndSplit implements FileAction {
 	private FileAction split;
 	private File inputFile;
 	private File toDelete;
+	private ProcessStatus status;
+	private boolean stop = false;
 	
 	public FileEncryptAndSplit(File inputFile, SplitConfiguration params) {
 		this.inputFile  = inputFile;
@@ -24,6 +27,7 @@ public class FileEncryptAndSplit implements FileAction {
 		else
 			split = new FileSplitterByPartNumber(encrypt.getOutputFile(),params);
 		toDelete = encrypt.getOutputFile();
+		status = ProcessStatus.Ready;
 	}
 	
 	public FileEncryptAndSplit(FileConfiguration conf) {
@@ -32,8 +36,14 @@ public class FileEncryptAndSplit implements FileAction {
 
 	@Override
 	public void start() {
+		status = ProcessStatus.Running;
 		encrypt.start();
 		split.start();
+		if (stop ) {
+			status = ProcessStatus.Stopped;
+		}else {
+			status = ProcessStatus.Completed;
+		}		
 	}
 
 	@Override
@@ -64,5 +74,22 @@ public class FileEncryptAndSplit implements FileAction {
 	@Override
 	public void clear() {
 		toDelete.delete();
+	}
+
+	@Override
+	public void stopAction() {
+		status = ProcessStatus.Stopping;
+		stop = true;
+		if (encrypt.getActionStatus() == ProcessStatus.Running) {
+			encrypt.stopAction();
+		}
+		if (split.getActionStatus() == ProcessStatus.Running) {
+			split.stopAction();
+		}
+	}
+
+	@Override
+	public ProcessStatus getActionStatus() {
+		return status;
 	}
 }

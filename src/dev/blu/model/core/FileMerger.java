@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalTime;
 
+import dev.blu.model.enums.ProcessStatus;
 import dev.blu.model.helpers.FileHelper;
 import dev.blu.model.interfaces.FileAction;
 
@@ -17,6 +18,8 @@ public class FileMerger implements FileAction{
     protected long[] bytesTransfered = new long[1];
 	private long totalBytes;
 	private String outputDir;
+	private ProcessStatus status;
+	private boolean[] stop = {false};//returns stop as an array (pointer workaround)
 	
     public FileMerger(FileConfiguration config) {
     	setFile(config.getFile());
@@ -25,6 +28,8 @@ public class FileMerger implements FileAction{
         
         bytesTransfered[0] = 0;
         totalBytes = 0;
+        
+        status = ProcessStatus.Ready;
     }
     
 
@@ -35,6 +40,8 @@ public class FileMerger implements FileAction{
         
         bytesTransfered[0] = 0;
         totalBytes = 0;
+        
+        status = ProcessStatus.Ready;
 	}
 
 
@@ -71,18 +78,26 @@ public class FileMerger implements FileAction{
             FileInputStream fis = new FileInputStream(tmp);
 
             if (getBufferLength()==0) //if bufferLength is set to default (0)
-                FileHelper.transfer(fis, fos, tmp.length(),bytesTransfered);
+                FileHelper.transfer(fis, fos, tmp.length(),bytesTransfered,stop);
             else
-                FileHelper.transfer(fis,fos,tmp.length(),getBufferLength(),bytesTransfered);
+                FileHelper.transfer(fis,fos,tmp.length(),getBufferLength(),bytesTransfered,stop);
 
             fis.close();
             i++;
         }
         fos.close();
+        
+        if (stop[0])
+        	output.delete();
+        
         return 0;
     }
 
-    public File getInputFile() {
+	private void setStop(boolean stop) { 
+		this.stop[0] = stop;
+	}
+
+	public File getInputFile() {
         return f;
     }
 
@@ -113,10 +128,16 @@ public class FileMerger implements FileAction{
 
 	@Override
 	public void start() {
+		status = ProcessStatus.Running;
 		try {
 			merge();
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+		if (stop[0]) {
+			status = ProcessStatus.Stopped;
+		} else {
+			status = ProcessStatus.Completed;			
 		}
 	}
 
@@ -175,6 +196,19 @@ public class FileMerger implements FileAction{
 	@Override
 	public void clear() {
 		//nothing to clear
+	}
+
+
+	@Override
+	public void stopAction() {
+		status = ProcessStatus.Stopping;
+		setStop(true);
+	}
+
+
+	@Override
+	public ProcessStatus getActionStatus() {
+		return status;
 	}
     
 }

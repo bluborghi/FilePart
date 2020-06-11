@@ -47,7 +47,8 @@ public class AppController {
 		view.addDirButtonActionListener(new DirButtonActionListener());
 		view.addAddButtonActionListener(new AddButtonActionListener());
 		view.addRemoveButtonActionListener(new RemoveButtonActionListener());
-		view.addStartButtonActionListener(new StartButtonActionListener());
+		view.addStartButtonActionListener(new StartButtonActionListener());;
+		view.addStopButtonActionListener(new StopButtonActionListener());
 		view.addFileListSelectionListener(new FileListSelectionListener());
 		view.addDetailsPanelFocusListener(new DetailsPanelFocusListener());
 		view.addActionTypeItemListener(new ActionTypeItemListener());
@@ -280,26 +281,34 @@ public class AppController {
 
 	private void disableUnnecessaryFields(ActionType action) {
 		switch (action) {
-		case SplitByMaxSize:{
-			view.getTxtSize().setEnabled(true);
-			view.getUnitSelector().setEnabled(true);
-			view.getTxtParts().setEnabled(false);
-			break;
+			case SplitByMaxSize:{
+				view.getTxtSize().setEnabled(true);
+				view.getUnitSelector().setEnabled(true);
+				view.getTxtParts().setEnabled(false);
+				break;
+			}
+			case SplitByNumberOfParts:{
+				view.getTxtSize().setEnabled(false);
+				view.getUnitSelector().setEnabled(false);
+				view.getTxtParts().setEnabled(true);
+				break;
+			}
+			case Merge:{
+				view.getTxtSize().setEnabled(false);
+				view.getUnitSelector().setEnabled(false);
+				view.getTxtParts().setEnabled(false);
+				break;
+			}
 		}
-		case SplitByNumberOfParts:{
-			view.getTxtSize().setEnabled(false);
-			view.getUnitSelector().setEnabled(false);
-			view.getTxtParts().setEnabled(true);
-			break;
+	}      
+	
+	class StopButtonActionListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			model.stopThreads();
 		}
-		case Merge:{
-			view.getTxtSize().setEnabled(false);
-			view.getUnitSelector().setEnabled(false);
-			view.getTxtParts().setEnabled(false);
-			break;
-		}
-		}
-	}       
+	}
 
 	class StartButtonActionListener implements ActionListener {
 		@Override

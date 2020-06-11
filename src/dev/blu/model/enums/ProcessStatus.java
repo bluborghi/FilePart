@@ -5,7 +5,9 @@ public enum ProcessStatus {
 	Waiting("Waiting"),
 	Running("Running"),
 	Error("Error"),
-	Completed("Completed");
+	Completed("Completed"), 
+	Stopping("Stopping"), 
+	Stopped("Stopped");
 	
 	private String name;
 	

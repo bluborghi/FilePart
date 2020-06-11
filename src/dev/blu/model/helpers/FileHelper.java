@@ -31,11 +31,11 @@ public class FileHelper {
         return fileName.lastIndexOf(".") != -1 && fileName.lastIndexOf(".") != 0;
     }
 
-    public static void transfer(FileInputStream fis, FileOutputStream fos, long partLength, long[] bytesTransferd) throws IOException {
-        transfer(fis,fos,partLength, DEFAULT_BUFFER_LENGTH, bytesTransferd);
+    public static void transfer(FileInputStream fis, FileOutputStream fos, long partLength, long[] bytesTransferd,  boolean[] stop) throws IOException {
+        transfer(fis,fos,partLength, DEFAULT_BUFFER_LENGTH, bytesTransferd, stop);
     }
 
-    public static void transfer(FileInputStream fis, FileOutputStream fos, long partLength, int maxBufferLength, long[] bytesTransferd) throws IOException {
+    public static void transfer(FileInputStream fis, FileOutputStream fos, long partLength, int maxBufferLength, long[] bytesTransferd, boolean[] stop) throws IOException {
         int buffer_length;
         int last_buffer_length;
         byte[] buffer;
@@ -46,15 +46,17 @@ public class FileHelper {
             numberOfTransfers = (int) ((partLength - 1) / buffer_length) + 1;
             last_buffer_length = (int) (partLength - buffer_length * (numberOfTransfers - 1));
             buffer = new byte[buffer_length];
-            for (long i = numberOfTransfers; i > 1; i--) { //only if there's more than one part (you need to transfer more bytes than the buffer size)
-                fis.read(buffer);
+            for (long i = numberOfTransfers; i > 1 && !stop[0]; i--) { //only if there's more than one part (you need to transfer more bytes than the buffer size)
+            	fis.read(buffer);
                 fos.write(buffer);
                 bytesTransferd[0]+=buffer.length;
             }
         } else {
             last_buffer_length = (int) partLength; //cast to int is ok (partLength <= MAX_BUF_LENGTH)
         }
-
+        if (stop[0])
+        	return;
+        
         buffer = new byte[last_buffer_length];
         fis.read(buffer);
         fos.write(buffer);

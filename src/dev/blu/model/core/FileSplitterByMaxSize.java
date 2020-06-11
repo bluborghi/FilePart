@@ -2,6 +2,7 @@ package dev.blu.model.core;
 
 import java.io.*;
 
+import dev.blu.model.enums.ProcessStatus;
 import dev.blu.model.helpers.FileHelper;
 import dev.blu.model.interfaces.FileAction;
 import dev.blu.model.interfaces.FileSplitter;
@@ -13,7 +14,9 @@ public class FileSplitterByMaxSize implements FileSplitter, FileAction {
 	protected long[] bytesTransfered = new long[1];
 	protected File destinationDirectory;
 	protected final static int DEF_BUF_LEN = 1 * 1024 * 1024; // 1 MiB
-
+	private boolean[] stop = {false};//returns stop as an array (pointer workaround)
+	private ProcessStatus status;
+	
 	private FileSplitterByMaxSize(File f, long maxSize, int bufferLength, String dest) {
 		setFile(f);
 		setMaxSize(maxSize);
@@ -26,7 +29,7 @@ public class FileSplitterByMaxSize implements FileSplitter, FileAction {
 			}
 		}
 		destinationDirectory = new File(dest);
-
+		status = ProcessStatus.Ready;
 	}
 
 	private FileSplitterByMaxSize(File f, long maxSize, String dest) {
@@ -75,9 +78,9 @@ public class FileSplitterByMaxSize implements FileSplitter, FileAction {
 				fos = new FileOutputStream(outputFile);
 
 				if (i < parts) {
-					FileHelper.transfer(fis, fos, part_length, bytesTransfered);
+					FileHelper.transfer(fis, fos, part_length, bytesTransfered, stop);
 				} else
-					FileHelper.transfer(fis, fos, last_part_length, bytesTransfered);
+					FileHelper.transfer(fis, fos, last_part_length, bytesTransfered, stop);
 
 				fos.close();
 
@@ -125,7 +128,14 @@ public class FileSplitterByMaxSize implements FileSplitter, FileAction {
 
 	@Override
 	public void start() {
+		status = ProcessStatus.Running;
 		split();
+		if (stop[0]) {
+			status = ProcessStatus.Stopped;
+		}
+		else {
+			status = ProcessStatus.Completed;
+		}
 	}
 
 	@Override
@@ -169,6 +179,21 @@ public class FileSplitterByMaxSize implements FileSplitter, FileAction {
 	@Override
 	public void clear() {
 		//nothing to clear
+	}
+
+	private void setStop(boolean stop) { 
+		this.stop[0] = stop;
+	}
+
+	@Override
+	public void stopAction() {
+		status = ProcessStatus.Stopping;
+		setStop(true);
+	}
+
+	@Override
+	public ProcessStatus getActionStatus() {
+		return status;
 	}
 
 }

@@ -57,6 +57,7 @@ public class AppView extends JFrame {
 	private JLabel lblStatus;
 	private JTable fileList;
 	private HashMap<UUID, SplitConfiguration> configs;
+	private JButton stopButton;
 
 	public AppView() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -84,6 +85,10 @@ public class AppView extends JFrame {
 
 		startButton = new JButton("Start");
 		panel_1.add(startButton);
+		
+		stopButton = new JButton("Stop");
+		panel_1.add(stopButton);
+		stopButton.setEnabled(false);
 
 		detailsPanel = new JPanel();
 		panel.add(detailsPanel, BorderLayout.NORTH);
@@ -186,6 +191,10 @@ public class AppView extends JFrame {
 
 	public void addStartButtonActionListener(ActionListener buttonActionListener) {
 		startButton.addActionListener(buttonActionListener);
+	}
+	
+	public void addStopButtonActionListener(ActionListener buttonActionListener) {
+		stopButton.addActionListener(buttonActionListener);
 	}
 	
 	public void addDirButtonActionListener(ActionListener buttonActionListener) {

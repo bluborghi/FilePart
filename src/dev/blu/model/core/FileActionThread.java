@@ -2,6 +2,7 @@ package dev.blu.model.core;
 
 import java.io.File;
 
+import dev.blu.model.enums.ProcessStatus;
 import dev.blu.model.interfaces.FileAction;
 
 public class FileActionThread extends Thread {
@@ -40,4 +41,11 @@ public class FileActionThread extends Thread {
 				|| fa==null;
 	}
 	
+	public void stopAction() {
+		fa.stopAction();
+	}
+	
+	public ProcessStatus getActionStatus() {
+		return fa.getActionStatus();
+	}
 }
