@@ -35,7 +35,9 @@ public class FileMergeAndDecrypt implements FileAction {
 	public void start() {
 		status = ProcessStatus.Running;
 		merge.start();
-		decrypt.start();
+		if (!stop)
+			decrypt.start();
+		
 		if (stop) {
 			status = ProcessStatus.Stopped;
 		}

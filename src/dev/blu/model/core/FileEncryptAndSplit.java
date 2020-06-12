@@ -38,7 +38,9 @@ public class FileEncryptAndSplit implements FileAction {
 	public void start() {
 		status = ProcessStatus.Running;
 		encrypt.start();
-		split.start();
+		if (!stop)
+			split.start();
+		
 		if (stop ) {
 			status = ProcessStatus.Stopped;
 		}else {

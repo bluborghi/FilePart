@@ -103,7 +103,7 @@ public class AppModel {
 				} else { // no password => no encryption
 					if (params.getPartSize() > 0)
 						action = new FileSplitterByMaxSize(conf);
-					if (params.getPartNumber() > 0)
+					else if (params.getPartNumber() > 0)
 						action = new FileSplitterByPartNumber(conf);
 					else // no split params => merge
 						action = new FileMerger(conf);
@@ -161,11 +161,9 @@ public class AppModel {
 		}
 		
 		@Override
-		public void run() {
-			if (t.isAlive())
-				setState(index,ProcessStatus.Running);
-			
+		public void run() {			
 			while(t.isAlive()) {
+				setState(index,t.getActionStatus());
 				double perc = t.getPercentage();
 				setPercentage(index, perc);
 				try {
@@ -174,7 +172,7 @@ public class AppModel {
 					e.printStackTrace();
 				}
 			}
-			setState(index,ProcessStatus.Completed);
+			setState(index,t.getActionStatus());
 		}
 	}
 	
