@@ -324,7 +324,28 @@ public class AppController {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			model.stopThreads();
-			setExecutionInterfaceEnabled(false);
+			new SetExecutionInterfaceEnabledThread(false).start();
+		}
+		
+	}
+	
+	class SetExecutionInterfaceEnabledThread extends Thread {
+		boolean value;
+		
+		public SetExecutionInterfaceEnabledThread(boolean value) {
+			this.value = value;
+		}
+		
+		@Override
+		public void run() {
+			while(model.isRunning()) {
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			setExecutionInterfaceEnabled(value);
 		}
 	}
 
@@ -341,8 +362,9 @@ public class AppController {
 	    			System.err.print(t.getErrorMessage());
 	    	}
 	    	
-	    	Vector<FileActionThread> startedThreads = model.startThreads();
-	    	
+	    	model.startThreads();
+
+			new SetExecutionInterfaceEnabledThread(false).start();
 	    	
 //	    	boolean running = true;
 //	    	while (running) {

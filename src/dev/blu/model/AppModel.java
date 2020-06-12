@@ -20,6 +20,7 @@ public class AppModel {
 	Vector<FileActionThread> preparedThreads;
 	Vector<FileConfiguration> preparedConfigs;
 	Vector<FileActionThread> startedThreads;
+	boolean isRunning = false;
 
 	public AppModel() {
 		configs = new Vector<FileConfiguration>(0,5);
@@ -142,6 +143,7 @@ public class AppModel {
 		}
 
 		preparedThreads = null;
+		new OverallProgressThread().start();
 		return startedThreads;
 	}
 	
@@ -172,7 +174,37 @@ public class AppModel {
 			}
 			setState(t.getActionId(),t.getActionStatus());
 		}
-	}	
+	}
+	
+	private class OverallProgressThread extends Thread {
+		@Override
+		public void run() {
+			setIsRunning(true);
+			boolean atLeastOneAlive = true;
+			while (atLeastOneAlive) {
+				atLeastOneAlive = false;
+				for(Thread t : startedThreads) {
+					if (t.isAlive())
+						atLeastOneAlive = true;
+				}
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			setIsRunning(false);
+		}
+
+	}
+
+	private void setIsRunning(boolean b) {
+		isRunning = b;
+	}
+	
+	public boolean isRunning() {
+		return isRunning;
+	}
 	
 	protected void setPercentage(UUID id, double perc) {
 		getFileConfig(id).setPercentage(perc);
