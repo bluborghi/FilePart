@@ -25,6 +25,7 @@ import java.util.UUID;
 import java.awt.event.ActionEvent;
 import java.awt.Dimension;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFormattedTextField;
 import javax.swing.JTextField;
@@ -369,6 +370,9 @@ public class AppView extends JFrame {
 	 * public String getOutputDir() { return txtOutputDir.getText(); }
 	 */
 
+	public JPanel getDetailsPanel() {
+		return detailsPanel;
+	}
 	public JComboBox<ActionType> getActionTypes() {
 		return actionTypes;
 	}
@@ -393,6 +397,20 @@ public class AppView extends JFrame {
 		return unitSelector;
 	}
 
+	public JButton getAddButton() {
+		return addButton;
+	}
 	
+	public JButton getRemoveButton() {
+		return removeButton;
+	}
 	
+	public JButton getStartButton() {
+		return startButton;
+	}
+
+	public JButton getStopButton() {
+		return stopButton;
+	}
+
 }

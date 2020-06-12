@@ -1,5 +1,6 @@
 package dev.blu.controller;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -14,6 +15,7 @@ import java.util.UUID;
 import java.util.Vector;
 
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFormattedTextField;
 import javax.swing.JPasswordField;
@@ -302,18 +304,34 @@ public class AppController {
 		}
 	}      
 	
+	private void setExecutionInterfaceEnabled(boolean enabled) {
+		for (Component c : view.getDetailsPanel().getComponents()) {
+			c.setEnabled(!enabled);
+		}
+		view.getAddButton().setEnabled(!enabled);
+		view.getRemoveButton().setEnabled(!enabled);
+		view.getStartButton().setEnabled(!enabled);
+		view.getStopButton().setEnabled(enabled);
+		
+		if (!enabled) {
+			 ActionType action = (ActionType) view.getActionTypes().getSelectedItem();
+	         disableUnnecessaryFields(action);
+		}
+	}
+	
 	class StopButtonActionListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			model.stopThreads();
+			setExecutionInterfaceEnabled(false);
 		}
 	}
 
 	class StartButtonActionListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {    	
-	     	
+	     	setExecutionInterfaceEnabled(true);
 			
 			
 	    	Vector<FileActionThread> threads = model.prepareThreads();
@@ -392,6 +410,7 @@ public class AppController {
 //			new ProgressThread(threads).start();
 //			view.setEnabledStartButton(false);
 		}
+
 	}
 
 //	class FileListSelectionListener implements ListSelectionListener {
