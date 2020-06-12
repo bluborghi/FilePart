@@ -1,6 +1,7 @@
 package dev.blu.model.core;
 
 import java.io.File;
+import java.util.UUID;
 
 import dev.blu.model.enums.ProcessStatus;
 import dev.blu.model.interfaces.FileAction;
@@ -8,14 +9,16 @@ import dev.blu.model.interfaces.FileAction;
 public class FileActionThread extends Thread {
 	private FileAction fa;
 	private String error;
+	private UUID id;
 	
-	public FileActionThread(FileAction fa, String err) {
+	public FileActionThread(FileAction fa, String err, UUID id) {
 		this.fa = fa;
 		this.error = err;
+		this.id = id;
 	}
 	
-	public FileActionThread(FileAction fa) {
-		this(fa,"");
+	public FileActionThread(FileAction fa, UUID id) {
+		this(fa,"", id);
 	}
 	
 	@Override
@@ -47,5 +50,9 @@ public class FileActionThread extends Thread {
 	
 	public ProcessStatus getActionStatus() {
 		return fa.getActionStatus();
+	}
+	
+	public UUID getActionId() {
+		return id;
 	}
 }

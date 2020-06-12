@@ -119,7 +119,7 @@ public class AppModel {
 				}
 
 				preparedConfigs.add(conf);
-				preparedThreads.add(new FileActionThread(action, err));
+				preparedThreads.add(new FileActionThread(action, err, conf.getId()));
 			}
 
 		}
@@ -131,14 +131,14 @@ public class AppModel {
 			return null;
 		
 		startedThreads = new Vector<FileActionThread>(0, 5);
-		int i = 0;
+		
 		for (FileActionThread t : preparedThreads) {
 			if (!t.hasErrors()) {
 				t.start();
-				new ProgressThread(i, t).start();
+				
+				new ProgressThread(t).start();
 				startedThreads.add(t);
 			}
-			i++;
 		}
 
 		preparedThreads = null;
@@ -150,38 +150,36 @@ public class AppModel {
 			t.stopAction();
 		});
 	}
-
+	
 	private class ProgressThread extends Thread {
-		private int index;
 		private FileActionThread t;
 
-		public ProgressThread(int index, FileActionThread t) {
-			this.index = index;
+		public ProgressThread(FileActionThread t) {
 			this.t = t;
 		}
 		
 		@Override
 		public void run() {			
 			while(t.isAlive()) {
-				setState(index,t.getActionStatus());
+				setState(t.getActionId(),t.getActionStatus());
 				double perc = t.getPercentage();
-				setPercentage(index, perc);
+				setPercentage(t.getActionId(), perc);
 				try {
 					Thread.sleep(100);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 			}
-			setState(index,t.getActionStatus());
+			setState(t.getActionId(),t.getActionStatus());
 		}
+	}	
+	
+	protected void setPercentage(UUID id, double perc) {
+		getFileConfig(id).setPercentage(perc);
 	}
 	
-	protected void setPercentage(int index, double perc) {
-		getFileConfigAt(index).setPercentage(perc);
-	}
-	
-	protected void setState(int index, ProcessStatus state) {
-		getFileConfigAt(index).setState(state);
+	protected void setState(UUID id, ProcessStatus state) {
+		getFileConfig(id).setState(state);
 	}
 
 }

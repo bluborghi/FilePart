@@ -63,15 +63,15 @@ public class GUIModel extends AppModel {
 	}
 
 	@Override
-	protected void setPercentage(int index, double perc) {
-		super.setPercentage(index, perc);
-		ftm.fireTableRowsUpdatedAt(index);
+	protected void setPercentage(UUID id, double perc) {
+		super.setPercentage(id, perc);
+		ftm.fireTableRowsUpdatedAt(getFileConfigIndex(id));
 	}
 	
 	@Override
-	protected void setState(int index, ProcessStatus state) {
-		super.setState(index, state);
-		ftm.fireTableRowsUpdatedAt(index);
+	protected void setState(UUID id, ProcessStatus state) {
+		super.setState(id, state);
+		ftm.fireTableRowsUpdatedAt(super.getFileConfigIndex(id));
 	}
 	
 	private void addSidePanel(ActionType at) {
