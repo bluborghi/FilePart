@@ -29,6 +29,7 @@ import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFormattedTextField;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.JLabel;
 
 import dev.blu.model.GUI.enums.ActionType;
@@ -158,7 +159,8 @@ public class AppView extends JFrame {
 
 		fileList = new JTable();
 		fileList.setRowSelectionAllowed(true);
-
+		fileList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		
 		scrollPane.setViewportView(fileList);
 
 		JPanel panel_2 = new JPanel();
@@ -259,6 +261,10 @@ public class AppView extends JFrame {
 
 	public int getSelectedIndex() {
 		return fileList.getSelectedRow();
+	}
+	
+	public int[] getSelectedRows() {
+		return fileList.getSelectedRows();
 	}
 
 	public void showStatus(String status) {

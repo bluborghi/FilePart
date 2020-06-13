@@ -38,6 +38,7 @@ public class AppModel {
 	}
 
 	public File removeFileAt(int index) {
+	
 		File f = getFileConfigAt(index).getFile();
 		
 		try {
@@ -77,6 +78,9 @@ public class AppModel {
 	}
 
 	public void updateConfig(UUID id, SplitConfiguration splitConfig) {
+		if (getFileConfig(id).getFile().getName().equals("trial.jpg")) {
+			System.out.println("iefjiefj");
+		}
 		getFileConfig(id).setSplitConfig(splitConfig);
 	}
 

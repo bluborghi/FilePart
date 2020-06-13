@@ -11,6 +11,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.text.ParseException;
+import java.util.Collections;
 import java.util.UUID;
 import java.util.Vector;
 
@@ -84,6 +85,7 @@ public class AppController {
 			if (index == -1)
 				return;
 		}
+
 		FileConfiguration fc = model.getFileConfigAt(index);
 		if (fc == null) // no file selected
 			return;
@@ -96,7 +98,7 @@ public class AppController {
 		
 		JComboBox<ByteUnit> unitSelector = view.getUnitSelector();
 		
-		long partSize = current.getPartSize();
+		long partSize = current != null ? current.getPartSize() : 0;
 		JFormattedTextField txtSize = view.getTxtSize();
 		try {
 			txtSize.commitEdit();
@@ -112,7 +114,7 @@ public class AppController {
 			partSize = 0;
 		}
 		
-		int partNumber = current.getPartNumber();
+		int partNumber = current != null ? current.getPartNumber() : 0;
 		JFormattedTextField txtParts = view.getTxtParts();
 		try {
 			txtParts.commitEdit();
@@ -173,6 +175,8 @@ public class AppController {
 			//System.out.println("add action performed");
 			JFileChooser fc = view.getFileChooser();
 			fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+			fc.setMultiSelectionEnabled(false);
+			
 			int returnVal = fc.showOpenDialog(view);
 
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -191,14 +195,18 @@ public class AppController {
 			//System.out.println("add action performed");
 			JFileChooser fc = view.getFileChooser();
 			fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+			fc.setMultiSelectionEnabled(true);
+			
 			int returnVal = fc.showOpenDialog(view);
 
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
-				File file = fc.getSelectedFile();
+				File[] files = fc.getSelectedFiles();
 				//System.out.println("Opening: " + file.getAbsolutePath());
-				UUID id = model.addFile(file);
+				for (File file : files) {
+					model.addFile(file);
+				}
 				int index = model.getConfigsCount() -1;
-				view.selectRows(index, index);
+				view.selectRows(index, index);					
 				//model.updateConfig(id, new SplitConfiguration(id, 3, 0, ByteUnit.B, "password".toCharArray(), "/run/media/blubo/Volume/FilePart/myFolder/mySecondOtherFolder"));
 			} else {
 				//System.out.println("Open command cancelled by user.");
@@ -210,8 +218,9 @@ public class AppController {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			// System.out.println("remove action performed");
+			int[] reverseIndexArray = reverse(view.getSelectedRows());
 			
-			int file_index = view.getSelectedIndex();
+			for (int file_index : reverseIndexArray)
 			if (file_index != -1) {
 //				System.out.println(model.getTableModel().getConfig(file_index).getSplitConfig().getPartSize());
 				model.removeFileAt(file_index);
@@ -230,6 +239,18 @@ public class AppController {
 				}
 			}
 		}
+
+		private int[] reverse(int a[]) 
+		{ 
+			int n = a.length;
+			int[] b = new int[n]; 
+			int j = n; 
+			for (int i = 0; i < n; i++) { 
+				b[j - 1] = a[i]; 
+				j = j - 1; 
+			} 
+			return b;
+		} 
 	}
 
 
@@ -248,10 +269,9 @@ public class AppController {
 			}
 			else { //if this selection is null, don't save data next time
 				setLastIndex(index);
-			}
+			}	
 		}
-
-	
+		
 	}
 	
 	class DetailsPanelFocusListener implements FocusListener {
