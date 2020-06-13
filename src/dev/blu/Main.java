@@ -2,6 +2,9 @@ package dev.blu;
 
 
 import javax.crypto.BadPaddingException;
+import javax.swing.UIManager;
+
+import com.bulenkov.darcula.DarculaLaf;
 
 import dev.blu.controller.AppController;
 import dev.blu.model.AppModel;
@@ -72,7 +75,12 @@ public class Main {
     	
 
     	
-    	
+    	try {
+    	    UIManager.setLookAndFeel( new DarculaLaf() );
+    	} catch( Exception ex ) {
+    	    System.err.println( "Failed to initialize LaF" );
+    	}
+
     	GUIModel model = new GUIModel();
     	AppView view = new AppView();
     	AppController controller = new AppController(model,view);
