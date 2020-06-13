@@ -121,9 +121,12 @@ public class FileMerger implements FileAction{
 	}
 
 	public void setOutputDir(String outputDir) {
-		if (outputDir.isEmpty())
+		if (outputDir == null || outputDir.isEmpty()) {
 			this.outputDir = getInputFile().getParent();
-		this.outputDir = outputDir;
+		}
+		else {			
+			this.outputDir = outputDir;
+		}
 	}
 
 	@Override
