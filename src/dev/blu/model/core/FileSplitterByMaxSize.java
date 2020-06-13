@@ -88,7 +88,16 @@ public class FileSplitterByMaxSize implements FileSplitter, FileAction {
 			}
 
 			fis.close();
-
+			
+			if (stop[0]) {
+				i = 1;
+				while (i <= parts) {
+					File fileToDelete = new File(destinationDirectory.getAbsolutePath() + File.separator + f.getName() + "."
+							+ String.format("%0" + extension_length + "d", i));
+					fileToDelete.delete();
+					i++;
+				}
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 			return -1;
