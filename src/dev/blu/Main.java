@@ -29,8 +29,9 @@ public class Main {
 
 	/**
 	 * starts the GUI
+	 * @param args unused command line args
 	 */
-    public static void main() {
+    public static void main(String[] args) {
     	
     	try {
     	    UIManager.setLookAndFeel( new DarculaLaf() );
