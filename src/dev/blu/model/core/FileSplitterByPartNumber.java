@@ -2,23 +2,41 @@ package dev.blu.model.core;
 
 import java.io.File;
 
+/**
+ * Splits a file in the specified number of parts
+ * @author blubo
+ *
+ */
 public class FileSplitterByPartNumber extends FileSplitterByMaxSize {
     private long parts;
 
+    /**
+	 * Initializes {@link FileSplitterByPartNumber} using a {@link FileConfiguration}
+	 * @param config The {@link FileConfiguration}
+	 */
     public FileSplitterByPartNumber(FileConfiguration config) {
         super(config);
-        setParts(config.getSplitConfig().getPartNumber());
+        setParts(config.getActionConfig().getPartNumber());
         long size = calcMaxSize();
         setMaxSize(size);
     }
 
-    public FileSplitterByPartNumber(File inputFile, SplitConfiguration params) {
+    /**
+	 * Initializes {@link FileSplitterByMaxSize} using an input {@link File} and a {@link FileActionConfiguration}
+	 * @param inputFile The {@link File} to split
+	 * @param params The {@link FileActionConfiguration} parameters
+	 */
+    public FileSplitterByPartNumber(File inputFile, FileActionConfiguration params) {
     	super(inputFile,params);
     	setParts(params.getPartNumber());
         long size = calcMaxSize();
         setMaxSize(size);
 	}
 
+    /**
+     * Gets the number of output parts
+     * @return The number of parts
+     */
 	public long getParts() {
         return parts;
     }
@@ -27,6 +45,10 @@ public class FileSplitterByPartNumber extends FileSplitterByMaxSize {
         this.parts = parts;
     }
 
+    /**
+     * Calculates the maximum file size in order to use parent's primitives
+     * @return the maximum file size in order to divide the input {@link File} in the desired number of parts
+     */
     protected long calcMaxSize(){
         long file_length = getInputFile().length();
         if (parts <= 0)
@@ -46,7 +68,7 @@ public class FileSplitterByPartNumber extends FileSplitterByMaxSize {
 			errors = errors.concat("Invalid buffer length").concat(System.lineSeparator());
 		if (getParts() <= 0)
 			errors = errors.concat("Invalid number of parts").concat(System.lineSeparator());
-		if (!getDestinationDirectory().isDirectory()) {
+		if (!getOutputDir().isDirectory()) {
 			errors = errors.concat("Invalid destination path").concat(System.lineSeparator());
 		}
 	

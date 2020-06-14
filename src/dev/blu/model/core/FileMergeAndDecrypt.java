@@ -3,15 +3,29 @@ package dev.blu.model.core;
 import java.io.File;
 import java.io.IOException;
 
+import dev.blu.model.enums.ProcessStatus;
 import dev.blu.model.interfaces.FileAction;
 
+
+/**
+ * A composite {@link FileAction} that uses {@link FileEncryptor} and {@link FileSplitterByMaxSize} to perform an encrypted division of a {@link File}
+ * @author blubo
+ *
+ */
 public class FileMergeAndDecrypt implements FileAction {
 	private FileAction merge;
 	private FileAction decrypt;
 	private File inputFile;
 	private File toDelete;
+	private ProcessStatus status;
+	private boolean stop = false;
 	
-	public FileMergeAndDecrypt(File inputFile, SplitConfiguration params) {
+	/**
+	 * Initializes {@link FileMergeAndDecrypt} using an input {@link File} and a {@link FileActionConfiguration}
+	 * @param inputFile The {@link File} to merge and decrypt
+	 * @param params The {@link FileActionConfiguration} parameters
+	 */
+	public FileMergeAndDecrypt(File inputFile, FileActionConfiguration params) {
 		this.inputFile  = inputFile;
 		merge = new FileMerger(inputFile,params);
 		try {
@@ -21,16 +35,30 @@ public class FileMergeAndDecrypt implements FileAction {
 		}
 		decrypt = new FileDecryptor(merge.getOutputFile(), params);
 		toDelete = merge.getOutputFile();
+		status = ProcessStatus.Ready;
 	}
 	
+	/**
+	 * Initializes {@link FileMergeAndDecrypt} using a {@link FileConfiguration}
+	 * @param conf The {@link FileConfiguration}
+	 */
 	public FileMergeAndDecrypt(FileConfiguration conf) {
-		this(conf.getFile(),conf.getSplitConfig());
+		this(conf.getFile(),conf.getActionConfig());
 	}
 
 	@Override
 	public void start() {
+		status = ProcessStatus.Running;
 		merge.start();
-		decrypt.start();
+		if (!stop)
+			decrypt.start();
+		
+		if (stop) {
+			status = ProcessStatus.Stopped;
+		}
+		else {
+			status = ProcessStatus.Completed;			
+		}
 	}
 
 	@Override
@@ -59,6 +87,23 @@ public class FileMergeAndDecrypt implements FileAction {
 	@Override
 	public void clear() {
 		toDelete.delete();
+	}
+
+	@Override
+	public void stopAction() {
+		status = ProcessStatus.Stopping;
+		stop = true;
+		if (merge.getActionStatus() == ProcessStatus.Running) {
+			merge.stopAction();
+		}
+		if (decrypt.getActionStatus() == ProcessStatus.Running) {
+			decrypt.stopAction();
+		}
+	}
+
+	@Override
+	public ProcessStatus getActionStatus() {
+		return status;
 	}
 
 }

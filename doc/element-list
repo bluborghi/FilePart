@@ -1,0 +1,10 @@
+dev.blu
+dev.blu.controller
+dev.blu.model
+dev.blu.model.core
+dev.blu.model.enums
+dev.blu.model.GUI
+dev.blu.model.GUI.enums
+dev.blu.model.helpers
+dev.blu.model.interfaces
+dev.blu.view
