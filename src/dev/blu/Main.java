@@ -29,9 +29,8 @@ public class Main {
 
 	/**
 	 * starts the GUI
-	 * @throws InterruptedException
 	 */
-    public static void main(String[] args) throws InterruptedException {
+    public static void main() {
     	
     	try {
     	    UIManager.setLookAndFeel( new DarculaLaf() );

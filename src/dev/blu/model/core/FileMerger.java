@@ -27,7 +27,7 @@ public class FileMerger implements FileAction{
 	
 	/**
 	 * Initializes {@link FileMerger} using a {@link FileConfiguration}
-	 * @param conf The {@link FileConfiguration}
+	 * @param config The {@link FileConfiguration}
 	 */
     public FileMerger(FileConfiguration config) {
     	setFile(config.getFile());
@@ -56,7 +56,7 @@ public class FileMerger implements FileAction{
 
     /**
      * Merge the group of files specified
-     * @throws IOException
+     * @throws IOException I/O error
      */
 	public void merge() throws IOException {
     	if (getTotalBytes() == 0) calcTotalBytes();

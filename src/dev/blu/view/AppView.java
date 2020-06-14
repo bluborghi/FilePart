@@ -255,7 +255,7 @@ public class AppView extends JFrame {
 	
 	/**
 	 * adds a listener to the {@link ActionType} {@link JComboBox}
-	 * @param itemListener
+	 * @param itemListener the item listener
 	 */
 	public void addActionTypeItemListener(ItemListener itemListener) {
 		actionTypes.addItemListener(itemListener);

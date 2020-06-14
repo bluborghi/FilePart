@@ -116,14 +116,14 @@ public abstract class FileCipher {
 	 * Encryption method, takes a password to perform a symmetric encryption with an AES/CBC/PKCS5Padding {@link Cipher} instance
 	 * @param password The password used to encrypt the File
 	 * @return The encrypted {@link File}
-	 * @throws IOException
-	 * @throws NoSuchAlgorithmException
-	 * @throws InvalidKeySpecException
-	 * @throws NoSuchPaddingException
-	 * @throws InvalidAlgorithmParameterException
-	 * @throws InvalidKeyException
-	 * @throws BadPaddingException
-	 * @throws IllegalBlockSizeException
+	 * @throws IOException IOException
+	 * @throws NoSuchAlgorithmException No such algorithm
+	 * @throws InvalidKeySpecException Invalid Key Spec
+	 * @throws NoSuchPaddingException No such padding
+	 * @throws InvalidAlgorithmParameterException Invalid Algorithm Parameter
+	 * @throws InvalidKeyException invalid key
+	 * @throws BadPaddingException  Bad padding
+	 * @throws IllegalBlockSizeException illegal block size
 	 */
 	public File Encrypt(char[] password)
 			throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, NoSuchPaddingException,
@@ -167,16 +167,14 @@ public abstract class FileCipher {
 	 * Decryption method, takes a password to perform a symmetric decryption with an AES/CBC/PKCS5Padding {@link Cipher} instance
 	 * @param password The password used to decrypt the File
 	 * @return The decrypted {@link File}
-	 * @param password
-	 * @return
-	 * @throws IOException
-	 * @throws NoSuchAlgorithmException
-	 * @throws InvalidKeySpecException
-	 * @throws NoSuchPaddingException
-	 * @throws InvalidAlgorithmParameterException
-	 * @throws InvalidKeyException
-	 * @throws BadPaddingException
-	 * @throws IllegalBlockSizeException
+	 * @throws IOException IOException
+	 * @throws NoSuchAlgorithmException No such algorithm
+	 * @throws InvalidKeySpecException Invalid Key Spec
+	 * @throws NoSuchPaddingException No such padding
+	 * @throws InvalidAlgorithmParameterException Invalid Algorithm Parameter
+	 * @throws InvalidKeyException invalid key
+	 * @throws BadPaddingException  Bad padding
+	 * @throws IllegalBlockSizeException illegal block size
 	 */
 	public File Decrypt(char[] password)
 			throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, NoSuchPaddingException,

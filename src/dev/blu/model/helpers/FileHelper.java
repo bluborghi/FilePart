@@ -68,7 +68,7 @@ public class FileHelper {
      * @param partLength the length (in bytes) to transfer
      * @param bytesTransfered the bytes actually transfered (needed to calculate the percentage)
      * @param stop a stop flag that can be turned on from outside
-     * @throws IOException
+     * @throws IOException I/O error
      */
     public static void transfer(FileInputStream fis, FileOutputStream fos, long partLength, long[] bytesTransfered,  boolean[] stop) throws IOException {
         transfer(fis,fos,partLength, DEFAULT_BUFFER_LENGTH, bytesTransfered, stop);

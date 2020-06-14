@@ -7,7 +7,7 @@ import dev.blu.model.enums.ProcessStatus;
 import dev.blu.model.interfaces.FileAction;
 
 /**
- * A composite {@link FileAction} that uses {@link FileEncryptor} and {@link FileSplitter} to perform an encrypted division of a {@link File}
+ * A composite {@link FileAction} that uses {@link FileEncryptor} and {@link FileSplitterByMaxSize} to perform an encrypted division of a {@link File}
  * @author blubo
  *
  */

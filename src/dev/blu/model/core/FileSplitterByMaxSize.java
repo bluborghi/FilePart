@@ -42,7 +42,7 @@ public class FileSplitterByMaxSize implements FileAction {
 
 	/**
 	 * Initializes {@link FileSplitterByMaxSize} using a {@link FileConfiguration}
-	 * @param conf The {@link FileConfiguration}
+	 * @param config The {@link FileConfiguration}
 	 */
 	public FileSplitterByMaxSize(FileConfiguration config) {
 		this(config.getFile(),
@@ -61,7 +61,6 @@ public class FileSplitterByMaxSize implements FileAction {
 
 	/**
 	 * Split the input file with the given parameters
-	 * @return
 	 */
 	public void split() {
 		if (maxSize <= 0) {

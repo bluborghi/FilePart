@@ -12,7 +12,7 @@ public class FileSplitterByPartNumber extends FileSplitterByMaxSize {
 
     /**
 	 * Initializes {@link FileSplitterByPartNumber} using a {@link FileConfiguration}
-	 * @param conf The {@link FileConfiguration}
+	 * @param config The {@link FileConfiguration}
 	 */
     public FileSplitterByPartNumber(FileConfiguration config) {
         super(config);
