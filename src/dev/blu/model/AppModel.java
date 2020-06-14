@@ -11,17 +11,20 @@ import dev.blu.model.core.FileMergeAndDecrypt;
 import dev.blu.model.core.FileMerger;
 import dev.blu.model.core.FileSplitterByMaxSize;
 import dev.blu.model.core.FileSplitterByPartNumber;
-import dev.blu.model.core.SplitConfiguration;
+import dev.blu.model.core.FileActionConfiguration;
 import dev.blu.model.enums.ProcessStatus;
 import dev.blu.model.interfaces.FileAction;
 
 public class AppModel {
-	Vector<FileConfiguration> configs;
-	Vector<FileActionThread> preparedThreads;
-	Vector<FileConfiguration> preparedConfigs;
-	Vector<FileActionThread> startedThreads;
-	boolean isRunning = false;
+	private Vector<FileConfiguration> configs;
+	private Vector<FileActionThread> preparedThreads;
+	private Vector<FileConfiguration> preparedConfigs;
+	private Vector<FileActionThread> startedThreads;
+	private boolean isRunning = false;
 
+	/**
+	 * Initializes the {@link AppModel}
+	 */
 	public AppModel() {
 		configs = new Vector<FileConfiguration>(0,5);
 	}
@@ -30,13 +33,22 @@ public class AppModel {
 		return configs;
 	}
 
+	/**
+	 * Creates a {@link FileConfiguration} from the given file and adds it to {@link AppModel}'s internal list
+	 * @param file The file to add
+	 * @return The {@link FileConfiguration} ID
+	 */
 	public UUID addFile(File file) {
-		UUID id = UUID.randomUUID();
-		FileConfiguration c = new FileConfiguration(file, id);
+		FileConfiguration c = new FileConfiguration(file);
 		configs.add(c);		
-		return id;
-	}
+		return c.getId(); 
+    }
 
+	/**
+	 * Removes a {@link FileConfiguration} at the specified index
+	 * @param index The specified index
+	 * @return The removed {@link File}
+	 */
 	public File removeFileAt(int index) {
 	
 		File f = getFileConfigAt(index).getFile();
@@ -49,19 +61,39 @@ public class AppModel {
 		return f;  // returns removed file
 	}
 
+	/**
+	 * Gets the {@link FileConfiguration} at a given index
+	 * @param index The given index
+	 * @return The requested {@link FileConfiguration}, <code>null</code> if the index is invalid
+	 */
 	public FileConfiguration getFileConfigAt(int index) {
 		if (index < 0 || configs==null || index >= configs.size()) return null;
 		return configs.get(index);	
 	}
 	
+	/**
+	 * Gets the {@link FileConfiguration} with the given ID
+	 * @param id The given {@link UUID}
+	 * @return The requested {@link FileConfiguration}
+	 */
 	public FileConfiguration getFileConfig(UUID id) {
 		return getFileConfigAt(getFileConfigIndex(id));
 	}
 
+	/**
+	 * Removes a {@link FileConfiguration} with the specified ID
+	 * @param id The specified {@link UUID}
+	 * @return The removed {@link File}
+	 */
 	public File removeFile(UUID id) {
 		return removeFileAt(getFileConfigIndex(id));
 	}
 	
+	/**
+	 * Gets the index of the {@link FileConfiguration} with the specified ID
+	 * @param id The specified {@link UUID}
+	 * @return the corresponding index
+	 */
 	public int getFileConfigIndex(UUID id) {
 		int i = 0;
 		for (FileConfiguration fc : configs) {
@@ -73,28 +105,43 @@ public class AppModel {
 		return -1;
 	}	
 	
+	/**
+	 * Gets the current number of {@link FileConfiguration}s stored
+	 * @return The number of file configurations
+	 */
 	public int getConfigsCount() {
 		return configs.size();
 	}
 
-	public void updateConfig(UUID id, SplitConfiguration splitConfig) {
-		if (getFileConfig(id).getFile().getName().equals("trial.jpg")) {
-			System.out.println("iefjiefj");
-		}
-		getFileConfig(id).setSplitConfig(splitConfig);
+	/**
+	 * Updates the {@link FileActionConfiguration} of the matching {@link FileConfiguration}
+	 * @param id The {@link UUID} of the {@link FileConfiguration} to update
+	 * @param fileActionConfig The new {@link FileActionConfiguration}
+	 */
+	public void updateConfig(UUID id, FileActionConfiguration fileActionConfig) {
+		getFileConfig(id).setActionConfig(fileActionConfig);
 	}
 
-	public SplitConfiguration getConfig(UUID id) {
-		return getFileConfig(id).getSplitConfig();
+	/**
+	 * Gets the {@link FileActionConfiguration} of the given ID
+	 * @param id The given {@link UUID}
+	 * @return The requested {@link FileActionConfiguration}
+	 */
+	public FileActionConfiguration getConfig(UUID id) {
+		return getFileConfig(id).getActionConfig();
 	}
 
+	/**
+	 * Prepares the thread to be executed, checking for errors and filtering the state
+	 * @return a collection of the prepared threads
+	 */
 	public Vector<FileActionThread> prepareThreads() {
 		preparedThreads = new Vector<FileActionThread>(0, 5);
 		preparedConfigs = new Vector<FileConfiguration>(0, 5);
 		for (FileConfiguration conf : configs) {
 			String err = "";
 			if (conf.getState() == ProcessStatus.Ready) {
-				SplitConfiguration params = conf.getSplitConfig();
+				FileActionConfiguration params = conf.getActionConfig();
 				FileAction action = null;
 
 				if (params == null) {
@@ -131,6 +178,10 @@ public class AppModel {
 		return preparedThreads;
 	}
 
+	/**
+	 * Start the previously prepared threads
+	 * @return the started threads
+	 */
 	public Vector<FileActionThread> startThreads() {
 		if (preparedThreads == null || preparedConfigs == null)
 			return null;
@@ -151,6 +202,9 @@ public class AppModel {
 		return startedThreads;
 	}
 	
+	/**
+	 * Stop all running {@link FileAction}s
+	 */
 	public void stopThreads() {
 		startedThreads.forEach((t) -> {
 			t.stopAction();
@@ -206,6 +260,10 @@ public class AppModel {
 		isRunning = b;
 	}
 	
+	/**
+	 * Checks if there are {@link FileAction}s running
+	 * @return <code>true</code> if there are {@link FileAction}s running, <code>false</code> otherwise
+	 */
 	public boolean isRunning() {
 		return isRunning;
 	}

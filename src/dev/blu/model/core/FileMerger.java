@@ -12,30 +12,40 @@ import dev.blu.model.interfaces.FileAction;
 
 import static java.time.temporal.ChronoUnit.MILLIS;
 
+/**
+ * Merge the partitions of a file together and rebuilds the original file
+ * @author blubo
+ *
+ */
 public class FileMerger implements FileAction{
     protected File f;
-    protected int bufferLength;
     protected long[] bytesTransfered = new long[1];
 	private long totalBytes;
 	private String outputDir;
 	private ProcessStatus status;
 	private boolean[] stop = {false};//returns stop as an array (pointer workaround)
 	
+	/**
+	 * Initializes {@link FileMerger} using a {@link FileConfiguration}
+	 * @param conf The {@link FileConfiguration}
+	 */
     public FileMerger(FileConfiguration config) {
     	setFile(config.getFile());
-        setBufferLength(0);//use default
-        setOutputDir(config.getSplitConfig().getOutputDir());
+        setOutputDir(config.getActionConfig().getOutputDir());
         
         bytesTransfered[0] = 0;
         totalBytes = 0;
         
         status = ProcessStatus.Ready;
     }
-    
 
-    public FileMerger(File inputFile, SplitConfiguration params) {
+	/**
+	 * Initializes {@link FileMerger} using an input {@link File} and a {@link FileActionConfiguration}
+	 * @param inputFile The first (.001) {@link File} partition to merge
+	 * @param params The {@link FileActionConfiguration} parameters
+	 */
+    public FileMerger(File inputFile, FileActionConfiguration params) {
     	setFile(inputFile);
-        setBufferLength(0);//use default
         setOutputDir(params.getOutputDir());
         
         bytesTransfered[0] = 0;
@@ -44,30 +54,20 @@ public class FileMerger implements FileAction{
         status = ProcessStatus.Ready;
 	}
 
-
-	public int merge() throws IOException {
+    /**
+     * Merge the group of files specified
+     * @throws IOException
+     */
+	public void merge() throws IOException {
     	if (getTotalBytes() == 0) calcTotalBytes();
-        /*String abs = getFile().getAbsolutePath();                                           //C:\files\photo.png
-        File starter = null;
-        int MAX_LENGTH = String.valueOf(Integer.MAX_VALUE).length();
-        for (int i = 1; i <= MAX_LENGTH; i++) {
-            File tmp = new File(abs + "." + String.format("%0" + i + "d", 1));
-            if (tmp.exists()) {
-                starter = tmp;
-                break;
-            }
-        }*/
+        
     	File starter = getInputFile();
-        if (starter == null) return -1;
+        if (starter == null) return;
 
         String full = starter.getAbsolutePath();                        //C:\files\photo.png.001
         String ext = FileHelper.getFileExtension(full);                            //001
         String commonPath = FileHelper.removeFileExtension(full);	//C:\files\photo.png
 
-        // String name = starter.getName();                                //photo.png.001
-       //String prefix = FileHelper.removeFileExtension(name);                      //photo.png
-       // String parent = FileHelper.getParentDirectory(full) + File.pathSeparator; //C:\files\
-       
         System.out.println(getOutputDir()+File.separator+FileHelper.removeFileExtension(starter.getName()));
         File output = new File(getOutputDir()+File.separator+FileHelper.removeFileExtension(starter.getName())); // outputDir\photo.png
         output.createNewFile();
@@ -76,12 +76,8 @@ public class FileMerger implements FileAction{
         int i = 1;
         while ((tmp = new File(commonPath + "." + String.format("%0" + ext.length() + "d", i))).exists()) { //C:\files\photo.png.i
             FileInputStream fis = new FileInputStream(tmp);
-
-            if (getBufferLength()==0) //if bufferLength is set to default (0)
-                FileHelper.transfer(fis, fos, tmp.length(),bytesTransfered,stop);
-            else
-                FileHelper.transfer(fis,fos,tmp.length(),getBufferLength(),bytesTransfered,stop);
-
+            FileHelper.transfer(fis, fos, tmp.length(),bytesTransfered,stop);
+            
             fis.close();
             i++;
         }
@@ -89,14 +85,16 @@ public class FileMerger implements FileAction{
         
         if (stop[0])
         	output.delete();
-        
-        return 0;
     }
 
 	private void setStop(boolean stop) { 
 		this.stop[0] = stop;
 	}
 
+	/**
+	 * Gets the first input {@link File}
+	 * @return The input {@link File}
+	 */
 	public File getInputFile() {
         return f;
     }
@@ -104,23 +102,16 @@ public class FileMerger implements FileAction{
     protected void setFile(File f1) {
         this.f = f1;
     }
-
-    public int getBufferLength() {
-        return bufferLength;
-    }
-
-    public void setBufferLength(int bufferLength) {
-        if (bufferLength<0)
-            this.bufferLength = 0; //if invalid, set to default
-        else
-            this.bufferLength = bufferLength;
-    }
     
+    /**
+	 * Gets the output file directory
+	 * @return the output directory
+	 */
 	public String getOutputDir() {
 		return outputDir;
 	}
 
-	public void setOutputDir(String outputDir) {
+	private void setOutputDir(String outputDir) {
 		if (outputDir == null || outputDir.isEmpty()) {
 			this.outputDir = getInputFile().getParent();
 		}

@@ -6,6 +6,11 @@ import java.io.IOException;
 import dev.blu.model.enums.ProcessStatus;
 import dev.blu.model.interfaces.FileAction;
 
+/**
+ * A composite {@link FileAction} that uses {@link FileEncryptor} and {@link FileSplitter} to perform an encrypted division of a {@link File}
+ * @author blubo
+ *
+ */
 public class FileEncryptAndSplit implements FileAction {
 	private FileAction encrypt;
 	private FileAction split;
@@ -14,7 +19,12 @@ public class FileEncryptAndSplit implements FileAction {
 	private ProcessStatus status;
 	private boolean stop = false;
 	
-	public FileEncryptAndSplit(File inputFile, SplitConfiguration params) {
+	/**
+	 * Initializes {@link FileEncryptAndSplit} using an input {@link File} and a {@link FileActionConfiguration}
+	 * @param inputFile The {@link File} to encrypt and split
+	 * @param params The {@link FileActionConfiguration} parameters
+	 */
+	public FileEncryptAndSplit(File inputFile, FileActionConfiguration params) {
 		this.inputFile  = inputFile;
 		encrypt = new FileEncryptor(inputFile,params);
 		try {
@@ -30,8 +40,12 @@ public class FileEncryptAndSplit implements FileAction {
 		status = ProcessStatus.Ready;
 	}
 	
+	/**
+	 * Initializes {@link FileEncryptAndSplit} using a {@link FileConfiguration}
+	 * @param conf The {@link FileConfiguration}
+	 */
 	public FileEncryptAndSplit(FileConfiguration conf) {
-		this(conf.getFile(), conf.getSplitConfig());
+		this(conf.getFile(), conf.getActionConfig());
 	}
 
 	@Override

@@ -5,20 +5,24 @@ import java.io.*;
 import dev.blu.model.enums.ProcessStatus;
 import dev.blu.model.helpers.FileHelper;
 import dev.blu.model.interfaces.FileAction;
-import dev.blu.model.interfaces.FileSplitter;
 
-public class FileSplitterByMaxSize implements FileSplitter, FileAction {
+/**
+ * Splits a file in parts with a maximum size for each part
+ * @author blubo
+ *
+ */
+public class FileSplitterByMaxSize implements FileAction {
 	protected File f;
 	protected long maxSize;
 	protected int bufferLength;
 	protected long[] bytesTransfered = new long[1];
-	protected File destinationDirectory;
+	protected File outputDir;
 	protected final static int DEF_BUF_LEN = 1 * 1024 * 1024; // 1 MiB
 	private boolean[] stop = {false};//returns stop as an array (pointer workaround)
 	private ProcessStatus status;
 	
 	private FileSplitterByMaxSize(File f, long maxSize, int bufferLength, String dest) {
-		setFile(f);
+		setInputFile(f);
 		setMaxSize(maxSize);
 		setBufferLength(bufferLength);
 		bytesTransfered[0] = 0;
@@ -28,7 +32,7 @@ public class FileSplitterByMaxSize implements FileSplitter, FileAction {
 				dest = f.getParent();
 			}
 		}
-		destinationDirectory = new File(dest);
+		outputDir = new File(dest);
 		status = ProcessStatus.Ready;
 	}
 
@@ -36,25 +40,37 @@ public class FileSplitterByMaxSize implements FileSplitter, FileAction {
 		this(f, maxSize, DEF_BUF_LEN, dest); // 1MiB standard buffer
 	}
 
+	/**
+	 * Initializes {@link FileSplitterByMaxSize} using a {@link FileConfiguration}
+	 * @param conf The {@link FileConfiguration}
+	 */
 	public FileSplitterByMaxSize(FileConfiguration config) {
 		this(config.getFile(),
-				config.getSplitConfig().getPartSize() * config.getSplitConfig().getUnit().getMultiplier(),
-				config.getSplitConfig().getOutputDir());
+				config.getActionConfig().getPartSize() * config.getActionConfig().getUnit().getMultiplier(),
+				config.getActionConfig().getOutputDir());
 	}
 
-	public FileSplitterByMaxSize(File inputFile, SplitConfiguration params) {
+	/**
+	 * Initializes {@link FileSplitterByMaxSize} using an input {@link File} and a {@link FileActionConfiguration}
+	 * @param inputFile The {@link File} to split
+	 * @param params The {@link FileActionConfiguration} parameters
+	 */
+	public FileSplitterByMaxSize(File inputFile, FileActionConfiguration params) {
 		this(inputFile, params.getPartSize() * params.getUnit().getMultiplier(), params.getOutputDir());
 	}
 
-	@Override
-	public int split() {
+	/**
+	 * Split the input file with the given parameters
+	 * @return
+	 */
+	public void split() {
 		if (maxSize <= 0) {
 			if (this instanceof FileSplitterByPartNumber) {
 				FileSplitterByPartNumber splitter = (FileSplitterByPartNumber) this;
 				maxSize = splitter.calcMaxSize();
 			}
 			else {
-				return -1;	
+				return;	
 			}
 		}
 		long parts = (f.length() + maxSize - 1) / maxSize;// formula to round up an integer division (positive only
@@ -72,7 +88,7 @@ public class FileSplitterByMaxSize implements FileSplitter, FileAction {
 
 			int i = 1;
 			while (i <= parts) {
-				File outputFile = new File(destinationDirectory.getAbsolutePath() + File.separator + f.getName() + "."
+				File outputFile = new File(outputDir.getAbsolutePath() + File.separator + f.getName() + "."
 						+ String.format("%0" + extension_length + "d", i));
 				FileOutputStream fos = null;
 				fos = new FileOutputStream(outputFile);
@@ -92,7 +108,7 @@ public class FileSplitterByMaxSize implements FileSplitter, FileAction {
 			if (stop[0]) {
 				i = 1;
 				while (i <= parts) {
-					File fileToDelete = new File(destinationDirectory.getAbsolutePath() + File.separator + f.getName() + "."
+					File fileToDelete = new File(outputDir.getAbsolutePath() + File.separator + f.getName() + "."
 							+ String.format("%0" + extension_length + "d", i));
 					fileToDelete.delete();
 					i++;
@@ -100,19 +116,26 @@ public class FileSplitterByMaxSize implements FileSplitter, FileAction {
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
-			return -1;
 		}
-		return 0;
+		return;
 	}
 
+	/**
+	 * Gets the input {@link File}
+	 * @return The input {@link File}
+	 */
 	public File getInputFile() {
 		return f;
 	}
 
-	protected void setFile(File f) {
+	protected void setInputFile(File f) {
 		this.f = f;
 	}
 
+	/**
+	 * Gets the maximum size of file output partition
+	 * @return The max partition size
+	 */
 	public long getMaxSize() {
 		return maxSize;
 	}
@@ -123,16 +146,28 @@ public class FileSplitterByMaxSize implements FileSplitter, FileAction {
 		this.maxSize = maxSize;
 	}
 
+	/**
+	 * Gets the buffer length
+	 * @return The buffer length
+	 */
 	public int getBufferLength() {
 		return bufferLength;
 	}
 
+	/**
+	 * Sets the buffer length
+	 * @param bufferLength The buffer length
+	 */
 	public void setBufferLength(int bufferLength) {
 		this.bufferLength = bufferLength;
 	}
 
-	public File getDestinationDirectory() {
-		return destinationDirectory;
+	/**
+	 * Gets the output files directory
+	 * @return the output directory as a {@link File}
+	 */
+	public File getOutputDir() {
+		return outputDir;
 	}
 
 	@Override
@@ -166,7 +201,7 @@ public class FileSplitterByMaxSize implements FileSplitter, FileAction {
 			errors = errors.concat("Invalid buffer length").concat(System.lineSeparator());
 		if (getMaxSize() <= 0)
 			errors = errors.concat("Invalid part size length").concat(System.lineSeparator());
-		if (!getDestinationDirectory().isDirectory()) {
+		if (!getOutputDir().isDirectory()) {
 			errors = errors.concat("Invalid destination path").concat(System.lineSeparator());
 		}
 
@@ -181,7 +216,7 @@ public class FileSplitterByMaxSize implements FileSplitter, FileAction {
 		int extension_length = String.valueOf(parts - 1).length();
 		if (extension_length < 3)
 			extension_length = 3;
-		return new File(destinationDirectory.getAbsolutePath() + File.separator + f.getName() + "."
+		return new File(outputDir.getAbsolutePath() + File.separator + f.getName() + "."
 				+ String.format("%0" + extension_length + "d", 1));
 	}
 

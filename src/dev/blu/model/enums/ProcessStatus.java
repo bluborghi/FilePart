@@ -1,8 +1,14 @@
 package dev.blu.model.enums;
 
+import dev.blu.model.interfaces.FileAction;
+
+/**
+ * The process status of a {@link FileAction}
+ * @author blubo
+ *
+ */
 public enum ProcessStatus {
 	Ready("Ready"),
-	Waiting("Waiting"),
 	Running("Running"),
 	Error("Error"),
 	Completed("Completed"), 

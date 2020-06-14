@@ -7,16 +7,11 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.text.ParseException;
-import java.util.Collections;
-import java.util.UUID;
 import java.util.Vector;
 
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFormattedTextField;
 import javax.swing.JPasswordField;
@@ -24,15 +19,12 @@ import javax.swing.JTextField;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import dev.blu.model.AppModel;
-import dev.blu.model.GUI.DetailsPanelOptions;
 import dev.blu.model.GUI.GUIModel;
 import dev.blu.model.GUI.enums.ActionType;
 import dev.blu.model.core.FileActionThread;
 import dev.blu.model.core.FileConfiguration;
-import dev.blu.model.core.SplitConfiguration;
+import dev.blu.model.core.FileActionConfiguration;
 import dev.blu.model.enums.ByteUnit;
-import dev.blu.model.helpers.FileHelper;
 import dev.blu.view.AppView;
 
 public class AppController {
@@ -40,6 +32,11 @@ public class AppController {
 	private GUIModel model;
 	private int lastIndex; 
 	
+	/**
+	 * Initialize the {@link AppController} with a {@link GUIModel} and a {@link AppView}
+	 * @param m the model
+	 * @param v the view
+	 */
 	public AppController(GUIModel m, AppView v) {
 		setView(v);
 		setModel(m);
@@ -55,8 +52,6 @@ public class AppController {
 		view.addFileListSelectionListener(new FileListSelectionListener());
 		view.addDetailsPanelFocusListener(new DetailsPanelFocusListener());
 		view.addActionTypeItemListener(new ActionTypeItemListener());
-//		view.addDetailsPanelPropertyChangeListener(new DetailsPanelPropertyChangeListener());
-//		view.addSplitOptionsItemListener(new SplitOptionItemListener());
 		
 		initActionTypes(view.getActionTypes());
 
@@ -90,10 +85,10 @@ public class AppController {
 		if (fc == null) // no file selected
 			return;
 
-		SplitConfiguration current = fc.getSplitConfig();
+		FileActionConfiguration current = fc.getActionConfig();
 		
 		JComboBox<ActionType> actionTypes = view.getActionTypes();
-		model.getSidePanelAt(index).setActionType((ActionType) actionTypes.getSelectedItem());
+		model.setActionTypeAt(index, (ActionType) actionTypes.getSelectedItem());
 		
 		
 		JComboBox<ByteUnit> unitSelector = view.getUnitSelector();
@@ -132,17 +127,17 @@ public class AppController {
 		char[] password = passwordField.getPassword();
 		String outputDir = txtOutputDir.getText();
 		
-		SplitConfiguration sc = new SplitConfiguration(fc.getId(), partNumber, partSize, byteUnit, password, outputDir);
+		FileActionConfiguration sc = new FileActionConfiguration(fc.getId(), partNumber, partSize, byteUnit, password, outputDir);
 		model.updateConfig(fc.getId(), sc);
 	}
 	
 	private void loadDetailsPanel(int index) {
-		DetailsPanelOptions dpc = model.getSidePanelAt(index);
+		ActionType at = model.getActionTypeAt(index);
 		
 		FileConfiguration fc = model.getFileConfigAt(index);
-		SplitConfiguration sc = fc.getSplitConfig();
+		FileActionConfiguration sc = fc.getActionConfig();
 		if (sc == null) {
-			sc = new SplitConfiguration( fc.getId() );
+			sc = new FileActionConfiguration( fc.getId() );
 			model.updateConfig(fc.getId(), sc);
 		}
 		
@@ -153,7 +148,7 @@ public class AppController {
 		JTextField txtOutputDir = view.getTxtOutputDir();
 		JPasswordField passwordField = view.getPasswordField();
 		
-		actionTypes.setSelectedItem(dpc.getActionType());
+		actionTypes.setSelectedItem(at);
 		txtSize.setValue(sc.getPartSize());
 		unitSel.setSelectedItem(sc.getUnit());
 		txtParts.setValue(sc.getPartNumber());
@@ -217,10 +212,7 @@ public class AppController {
 	class RemoveButtonActionListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			// System.out.println("remove action performed");
-			int[] reverseIndexArray = reverse(view.getSelectedRows());
-			
-			for (int file_index : reverseIndexArray)
+			int file_index = view.getSelectedIndex();
 			if (file_index != -1) {
 //				System.out.println(model.getTableModel().getConfig(file_index).getSplitConfig().getPartSize());
 				model.removeFileAt(file_index);
@@ -385,140 +377,9 @@ public class AppController {
 	    	model.startThreads();
 
 			new SetExecutionInterfaceEnabledThread(false).start();
-	    	
-//	    	boolean running = true;
-//	    	while (running) {
-//	    		running = false;
-//	    		for (FileActionThread t : startedThreads) {
-//	    			if (t.isAlive()) {
-//	    				running = true;
-//	    			}
-//	    			System.out.print(t.getFile().getName() + ": " + Math.floor(t.getPercentage()*10)/10 + " | ");
-//	    		}    		
-//	    		System.out.println();
-//	    		try {
-//					Thread.sleep(100);
-//				} catch (InterruptedException e1) {
-//					// TODO Auto-generated catch block
-//					e1.printStackTrace();
-//				} 
-//	    	}
-//	    	
-//	    	System.out.println("done");
-			
-			
-//			Vector<SplitConfiguration> queue = view.getQueue();
-//			HashMap<UUID,FileActionThread> threads = new HashMap<UUID,FileActionThread>();
-//			
-//			for (SplitConfiguration c : queue) {
-//				
-//				switch (c.getSplitOption()) {
-//				case DoNothing: {
-//					break;
-//				}
-//				case Merge: {
-//					File f = view.getFile(c.getId());
-//					FileActionThread t = new FileActionThread(new FileMerger(f));
-//					threads.put(c.getId(), t);
-//					break;
-//				}
-//				case MergeAndDecrypt: {
-//					break;
-//				}
-//				case SplitAndEncrypt: {
-//					break;
-//				}
-//				case SplitByMaxSize: {
-//					File f = view.getFile(c.getId());
-//					FileActionThread t = new FileActionThread(new FileSplitterByMaxSize(f,c.getPartSize()));
-//					threads.put(c.getId(), t);
-//					break;
-//				}
-//				case SplitByPartNumber: {
-//					File f = view.getFile(c.getId());
-//					FileActionThread t = new FileActionThread(new FileSplitterByPartNumber(f,c.getPartNumber()));
-//					threads.put(c.getId(), t);
-//					break;
-//				}
-//				}
-//				
-//			}
-//			
-//			threads.forEach((id,t) -> {
-//				t.start();
-//				view.setProcessStatus(id, ProcessStatus.Running);
-//			});
-//			
-//			new ProgressThread(threads).start();
-//			view.setEnabledStartButton(false);
+	    
 		}
 
 	}
 
-//	class FileListSelectionListener implements ListSelectionListener {
-//		@Override
-//		public void valueChanged(ListSelectionEvent e) {
-//			AppView view = getView();
-//			File current = view.getSelectedFile();
-//			if (current != null) {
-//				view.showStatus("Current File: " + current.getPath());
-//				view.loadConfig();
-//			} else {
-//				view.showStatus("");
-//			}
-//		}
-//	}
-//	
-//	
-//	class SplitOptionItemListener implements ItemListener{
-//	    @Override
-//	    public void itemStateChanged(ItemEvent event) {
-//	       if (event.getStateChange() == ItemEvent.SELECTED) {
-//	          SplitOption item = (SplitOption) event.getItem();
-//	          System.out.println(item);
-//	       }
-//	    }
-//	}
-//
-//	class DetailsPanelFocusListener implements FocusListener {
-//
-//		@Override
-//		public void focusGained(FocusEvent e) {
-//
-//		}
-//
-//		@Override
-//		public void focusLost(FocusEvent e) {
-//			view.saveConfig();
-//		}
-//
-//	}
-//
-//	class ProgressThread extends Thread {
-//		HashMap<UUID,FileActionThread> threads;
-//		
-//		public ProgressThread(HashMap<UUID,FileActionThread> threads) {
-//			this.threads = threads;
-//		}
-//		
-//		@Override
-//		public void run() {
-//			boolean someoneAlive = true;
-//			while (someoneAlive) {
-//				someoneAlive = false;
-//				for(Map.Entry<UUID, FileActionThread> entry : threads.entrySet()) {
-//				    FileActionThread t = entry.getValue();
-//				    UUID id = entry.getKey();
-//				    if (t.isAlive()) {
-//				    	someoneAlive = true;
-//				    	view.setPercentage(id,t.getPercentage());
-//				    }
-//				    else {
-//				    	view.setProcessStatus(id, ProcessStatus.Completed);
-//				    }
-//				}
-//			}
-//			view.setEnabledStartButton(true);
-//		}
-//	}
 }

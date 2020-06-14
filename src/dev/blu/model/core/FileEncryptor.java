@@ -13,23 +13,36 @@ import javax.crypto.NoSuchPaddingException;
 
 import dev.blu.model.enums.ProcessStatus;
 import dev.blu.model.interfaces.FileAction;
-
+/**
+ * Encrypts a given file with the given password
+ * @author blubo
+ *
+ */
 public class FileEncryptor extends FileCipher implements FileAction {
 	private static final int MIN_PW_LENGTH = 8;
 	private char[] password;
 	private ProcessStatus status;
 	private boolean stop = false;
 	
+	/**
+	 * Initializes a {@link FileEncryptor} using a {@link FileConfiguration}
+	 * @param config The {@link FileConfiguration}
+	 */
 	public FileEncryptor(FileConfiguration config) {
 		super(
 				config.getFile(),
-				config.getSplitConfig().getOutputDir()
+				config.getActionConfig().getOutputDir()
 			);
-		password = config.getSplitConfig().getPw();
+		password = config.getActionConfig().getPw();
 		status = ProcessStatus.Ready;
 	}
 	
-	public FileEncryptor(File inputFile, SplitConfiguration params) {
+	/**
+	 * Initializes a {@link FileEncryptor} using an input {@link File} and a {@link FileActionConfiguration}
+	 * @param inputFile The input {@link File}
+	 * @param params The {@link FileActionConfiguration} parameters
+	 */
+	public FileEncryptor(File inputFile, FileActionConfiguration params) {
 		super(
 				inputFile,
 				params.getOutputDir()

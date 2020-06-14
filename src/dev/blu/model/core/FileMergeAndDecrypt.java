@@ -6,6 +6,12 @@ import java.io.IOException;
 import dev.blu.model.enums.ProcessStatus;
 import dev.blu.model.interfaces.FileAction;
 
+
+/**
+ * A composite {@link FileAction} that uses {@link FileEncryptor} and {@link FileSplitter} to perform an encrypted division of a {@link File}
+ * @author blubo
+ *
+ */
 public class FileMergeAndDecrypt implements FileAction {
 	private FileAction merge;
 	private FileAction decrypt;
@@ -14,7 +20,12 @@ public class FileMergeAndDecrypt implements FileAction {
 	private ProcessStatus status;
 	private boolean stop = false;
 	
-	public FileMergeAndDecrypt(File inputFile, SplitConfiguration params) {
+	/**
+	 * Initializes {@link FileMergeAndDecrypt} using an input {@link File} and a {@link FileActionConfiguration}
+	 * @param inputFile The {@link File} to merge and decrypt
+	 * @param params The {@link FileActionConfiguration} parameters
+	 */
+	public FileMergeAndDecrypt(File inputFile, FileActionConfiguration params) {
 		this.inputFile  = inputFile;
 		merge = new FileMerger(inputFile,params);
 		try {
@@ -27,8 +38,12 @@ public class FileMergeAndDecrypt implements FileAction {
 		status = ProcessStatus.Ready;
 	}
 	
+	/**
+	 * Initializes {@link FileMergeAndDecrypt} using a {@link FileConfiguration}
+	 * @param conf The {@link FileConfiguration}
+	 */
 	public FileMergeAndDecrypt(FileConfiguration conf) {
-		this(conf.getFile(),conf.getSplitConfig());
+		this(conf.getFile(),conf.getActionConfig());
 	}
 
 	@Override

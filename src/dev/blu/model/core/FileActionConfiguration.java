@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import dev.blu.model.enums.ByteUnit;
 
-public class SplitConfiguration {
+public class FileActionConfiguration {
 	private int partNumber;
 	private long partSize;
 	private ByteUnit unit;
@@ -13,7 +13,7 @@ public class SplitConfiguration {
 	private String outputDir;
 	private UUID id;
 	
-	public SplitConfiguration(UUID id,int partNumber, long partSize, ByteUnit unit, char[] pw,
+	public FileActionConfiguration(UUID id,int partNumber, long partSize, ByteUnit unit, char[] pw,
 			String outputDir) {
 		this.id = id;
 		this.partNumber = partNumber;
@@ -23,7 +23,7 @@ public class SplitConfiguration {
 		this.outputDir = outputDir;
 	}
 	
-	public SplitConfiguration(UUID id) {
+	public FileActionConfiguration(UUID id) {
 		this(id, 0, 0, ByteUnit.MiB, new char[0] , "");
 	}
 	

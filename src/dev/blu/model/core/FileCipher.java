@@ -1,3 +1,4 @@
+
 package dev.blu.model.core;
 
 import javax.crypto.*;
@@ -18,45 +19,12 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.util.zip.CRC32;
 
-/* HOW CRC WORKS
 
-    CODE
-    byte[] chunk1 = {12,45,2,15,67};
-    byte[] chunk2 = {100,9,12,76,33};
-    byte[] chunk3 = {2,99,45,122,4};
-    byte[] chunk4 = {12,45,2,15,67,100,9,12,76,33,2,99,45,122,4};
-
-    CRC32 crc123 = new CRC32();
-    System.out.println(crc123.getValue());
-    crc123.update(chunk1);
-    System.out.println(crc123.getValue());
-    crc123.update(chunk2);
-    System.out.println(crc123.getValue());
-    crc123.update(chunk3);
-    System.out.println(crc123.getValue());
-
-    System.out.println();
-    CRC32 crc4=new CRC32();
-    System.out.println(crc4.getValue());
-    crc4.update(chunk4);
-    System.out.println(crc4.getValue());
-
-    OUTPUT
-    0
-    977515892
-    3215758702
-    1761260175
-
-    0
-    1761260175
+/**
+ * Class that contains file encryption/decryption methods
+ * @author blubo
+ *
  */
-
-/*
-take an input file, calculate crc32, encrypt, add crc32 bytes at the end of encrypted bytes, split in multiple files
-
-encrypt input file with key generated from user's password, hash the password and store it at the end of the output file
- */
-
 public abstract class FileCipher {
 	private static int DEFAULT_BUFFER_LENGTH = 4 * 1024 * 1024;
 	private int bufferLength;
@@ -65,27 +33,29 @@ public abstract class FileCipher {
 	private double percentage = 0;
 	private boolean stop = false;
 
-	protected FileCipher() {
-		// don't use this
-	}
-
+	/**
+	 * Initializes a {@link FileCipher} 
+	 * @param f The File to encrypt or decrypt
+	 * @param outputDir The directory of the output file
+	 */
 	protected FileCipher(File f, String outputDir) {
 		this.f_in = f;
 		setOutputDir(outputDir);
 		setBufferLength(DEFAULT_BUFFER_LENGTH);
 	}
 
-	/*
-	 * public FileCipher(File f, String outputDir) { this
-	 * (f,outputDir,DEFAULT_BUFFER_LENGTH); }
-	 * 
-	 * public FileCipher(File f) { this(f, getParentDirectory(f.getAbsolutePath()),
-	 * DEFAULT_BUFFER_LENGTH); }
+	/**
+	 * Gets the output file directory
+	 * @return The output file directory as a {@link String}
 	 */
 	public String getOutputDir() {
 		return outputDir;
 	}
 
+	/**
+	 * Sets the output file directory
+	 * @param outputDir the new output file directory, if <code>null</code> or ermpty the same directory of the input file is used
+	 */
 	public void setOutputDir(String outputDir) {
 		if ((outputDir == null || outputDir.isEmpty()) && getInputFile() != null)
 			this.outputDir = getInputFile().getParent();
@@ -93,34 +63,68 @@ public abstract class FileCipher {
 			this.outputDir = outputDir;
 	}
 
+	/**
+	 * Gets the buffer length
+	 * @return The buffer length
+	 */
 	public int getBufferLength() {
 		return bufferLength;
 	}
 
+	/**
+	 * Sets the buffer length. This is optional, if the buffer length is unset then a default value is used
+	 * @param bufferLength The buffer length
+	 */
 	public void setBufferLength(int bufferLength) {
 		this.bufferLength = bufferLength;
 	}
 
+	/**
+	 * Gets the input file
+	 * @return The input file
+	 */
 	public File getInputFile() {
 		return f_in;
 	}
 
-	public File getEncryptionOutputFile() {
+	
+	private File getEncryptionOutputFile() {
 		return new File(getOutputDir() + File.separator + getInputFile().getName() + ".crypt");
 	}
 	
-	public File getDecryptionOutputFile() {
+	private File getDecryptionOutputFile() {
 		return new File(getOutputDir() + File.separator + removeFileExtension(getInputFile().getName()));
 	}
 
+	/** 
+	 * Gets the progress of the Encrytion/Decription process
+	 * @return The percentage as {@link Double} in [0-100] range
+	 */
 	public double getPercentage() {
 		return percentage;
 	}
 
+	/** 
+	 * Sets the progress of the Encrytion/Decription process
+	 * @param percentage The percentage as {@link Double} in [0-100] range
+	 */
 	protected void setPercentage(double percentage) {
 		this.percentage = percentage;
 	}
 
+	/**
+	 * Encryption method, takes a password to perform a symmetric encryption with an AES/CBC/PKCS5Padding {@link Cipher} instance
+	 * @param password The password used to encrypt the File
+	 * @return The encrypted {@link File}
+	 * @throws IOException
+	 * @throws NoSuchAlgorithmException
+	 * @throws InvalidKeySpecException
+	 * @throws NoSuchPaddingException
+	 * @throws InvalidAlgorithmParameterException
+	 * @throws InvalidKeyException
+	 * @throws BadPaddingException
+	 * @throws IllegalBlockSizeException
+	 */
 	public File Encrypt(char[] password)
 			throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, NoSuchPaddingException,
 			InvalidAlgorithmParameterException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
@@ -159,6 +163,21 @@ public abstract class FileCipher {
 		return output;
 	}
 
+	/**
+	 * Decryption method, takes a password to perform a symmetric decryption with an AES/CBC/PKCS5Padding {@link Cipher} instance
+	 * @param password The password used to decrypt the File
+	 * @return The decrypted {@link File}
+	 * @param password
+	 * @return
+	 * @throws IOException
+	 * @throws NoSuchAlgorithmException
+	 * @throws InvalidKeySpecException
+	 * @throws NoSuchPaddingException
+	 * @throws InvalidAlgorithmParameterException
+	 * @throws InvalidKeyException
+	 * @throws BadPaddingException
+	 * @throws IllegalBlockSizeException
+	 */
 	public File Decrypt(char[] password)
 			throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, NoSuchPaddingException,
 			InvalidAlgorithmParameterException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {

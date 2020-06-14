@@ -33,13 +33,19 @@ import javax.swing.ListSelectionModel;
 import javax.swing.JLabel;
 
 import dev.blu.model.GUI.enums.ActionType;
-import dev.blu.model.core.SplitConfiguration;
+import dev.blu.model.core.FileActionConfiguration;
+import dev.blu.model.core.FileConfiguration;
 import dev.blu.model.enums.ByteUnit;
 import net.miginfocom.swing.MigLayout;
 import javax.swing.JPasswordField;
 import java.awt.Font;
 import javax.swing.JTable;
 
+/**
+ * The program's graphic user interface
+ * @author blubo
+ *
+ */
 public class AppView extends JFrame {
 
 	private JPanel contentPane;
@@ -55,12 +61,14 @@ public class AppView extends JFrame {
 	private JButton addButton;
 	private JButton removeButton;
 	private JButton startButton;
-//	private FileTableModel ftm;
 	private JLabel lblStatus;
 	private JTable fileList;
-	private HashMap<UUID, SplitConfiguration> configs;
+	private HashMap<UUID, FileActionConfiguration> configs;
 	private JButton stopButton;
 
+	/**
+	 * Initializes all graphical components
+	 */
 	public AppView() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
@@ -176,152 +184,141 @@ public class AppView extends JFrame {
 		panel_2.add(verticalStrut);
 
 		fileChooser = new JFileChooser();
-		configs = new HashMap<UUID, SplitConfiguration>();
+		configs = new HashMap<UUID, FileActionConfiguration>();
 	}
 	
+	/**
+	 * Gets the {@link JFileChooser}
+	 * @return The {@link JFileChooser}
+	 */
 	public JFileChooser getFileChooser() {
 		return this.fileChooser;
 	}
 
-
+	/**
+	 * Adds a listener to the add button
+	 * @param buttonActionListener The listener
+	 */
 	public void addAddButtonActionListener(ActionListener buttonActionListener) {
 		addButton.addActionListener(buttonActionListener);
 	}
 
+	/**
+	 * Adds a listener to the remove button
+	 * @param buttonActionListener The listener
+	 */
 	public void addRemoveButtonActionListener(ActionListener buttonActionListener) {
 		removeButton.addActionListener(buttonActionListener);
 	}
 
+	/**
+	 * Adds a listener to the Start button
+	 * @param buttonActionListener The listener
+	 */
 	public void addStartButtonActionListener(ActionListener buttonActionListener) {
 		startButton.addActionListener(buttonActionListener);
 	}
 	
+	/**
+	 * Adds a listener to the Stop button
+	 * @param buttonActionListener The listener
+	 */
 	public void addStopButtonActionListener(ActionListener buttonActionListener) {
 		stopButton.addActionListener(buttonActionListener);
 	}
 	
+	/**
+	 * Adds a listener to the Dir button
+	 * @param buttonActionListener The listener
+	 */
 	public void addDirButtonActionListener(ActionListener buttonActionListener) {
 		dirButton.addActionListener(buttonActionListener);
 	}
 
+	/**
+	 * adds a listener to the {@link FileConfiguration} {@link JTable}
+	 * @param listSelectionListener the selection listener
+	 */
 	public void addFileListSelectionListener(ListSelectionListener listSelectionListener) {
 		fileList.getSelectionModel().addListSelectionListener(listSelectionListener);
 	}
 
+	/**
+	 * adds a listener to the side panel
+	 * @param fl the focus listener
+	 */
 	public void addDetailsPanelFocusListener(FocusListener fl) {
 		for (Component c : detailsPanel.getComponents()) {
 			c.addFocusListener(fl);
 		}
 	}
 	
+	/**
+	 * adds a listener to the {@link ActionType} {@link JComboBox}
+	 * @param itemListener
+	 */
 	public void addActionTypeItemListener(ItemListener itemListener) {
 		actionTypes.addItemListener(itemListener);
 	}
 	
+	/**
+	 * Sets the {@link TableModel} of the {@link JTable}
+	 * @param m The {@link TableModel}
+	 */
 	public void setTableModel(TableModel m) {
 		fileList.setModel(m);
 	} //AppModel holds the table model
-	
-//	public void addFile(File file, boolean selectNewFile) {
-//		System.out.println("added file " + file.getName());
-//		if (file != null) {
-//			ftm.addFile(file);
-//			selectRows(ftm.getRowCount() - 1, ftm.getRowCount() - 1);
-//		}
-//	}
-//	public void addFile(File file) {
-//		addFile(file, true);
-//	}
-//
-//	public void removeFile(int index) {
-//		if (ftm.removeFileAt(index) != 0)
-//			return;
-//		if (ftm.getRowCount() != 0) {
-//			if (rowExists(index)) // user deleted a row in the middle
-//				selectRows(index, index);
-//			else // user deleted the last row
-//				selectRows(index - 1, index - 1);
-//		}
-//	}
 
-	public int selectRows(int row0, int row1) {
+	/**
+	 * Select the specified rows interval
+	 * @param row0 first row index (inclusive)
+	 * @param row1 last row index (inclusive) 
+	 */
+	public void selectRows(int row0, int row1) {
 		fileList.clearSelection();
 		try {
 			fileList.addRowSelectionInterval(row0, row1);
 		} catch (IllegalArgumentException e) {
-			return 1;
+			e.printStackTrace();
 		}
-		return 0;
+		return;
 	}
 
-
+	/**
+	 * Check if the row exists
+	 * @param row The specified row
+	 * @return <code>true</code> if the row exists, <code>false</code> otherwise
+	 */
 	public boolean rowExists(int row) {
 		return row < fileList.getRowCount();
 	}
 
+	/**
+	 * Gets the selected row's index in the {@link JTable}
+	 * @return the selected index
+	 */
 	public int getSelectedIndex() {
 		return fileList.getSelectedRow();
 	}
 	
-	public int[] getSelectedRows() {
-		return fileList.getSelectedRows();
-	}
-
-	public void showStatus(String status) {
-		lblStatus.setText(status);
+	/**
+	 * shows a custom message at the bottom of the window
+	 * @param message the custom message
+	 */
+	public void showMessage(String message) {
+		lblStatus.setText(message);
 	}
 	
-	private SplitConfiguration getConfigById(UUID id) {
+	private FileActionConfiguration getConfigById(UUID id) {
 		if (id == null)
 			return null;
-		SplitConfiguration config = configs.get(id);
+		FileActionConfiguration config = configs.get(id);
 		if (config == null) {
-			config = new SplitConfiguration( id );
+			config = new FileActionConfiguration( id );
 			configs.put(id, config);
 		}
 		return config;
 	}
-
-//	public void loadConfig() {
-//		SplitConfiguration config = getCurrentConfig();
-//		if (config == null) // no file selected
-//			return;
-//
-//		actionTypes.setSelectedItem(config.getSplitOption());
-//		setValueByNumber(config.getPartNumber(), txtParts);
-//		setValueByNumber(config.getPartSize(), txtSize);
-//		setPassword(config.getPw());
-//		unitSelector.setSelectedItem(config.getUnit());
-//
-//		// TODO implement output dir load
-//	}
-
-//	private void setPassword(char[] pw) {
-//		String p = "";
-//		if (pw != null) {
-//			for (char c : pw) {
-//				p = p + c;
-//			} 			
-//		}
-//		passwordField.setText(p);
-//	}
-
-//	public void saveConfig() {
-//		SplitConfiguration config = getCurrentConfig();
-//		if (config == null) // no file selected
-//			return;
-//
-//		config.setSplitOption((SplitOption) actionTypes.getSelectedItem());
-//		if (txtParts.getValue() instanceof Long)
-//			config.setPartNumber((long) txtParts.getValue());
-//		if (txtSize.getValue() instanceof Long)
-//			config.setPartSize((long) txtSize.getValue());
-//		config.setPw(passwordField.getPassword());
-//		config.setUnit((ByteUnit) unitSelector.getSelectedItem());
-//
-//		// TODO implement output dir save
-//	}
-
 
 	private void setValueByNumber(long i, JFormattedTextField txt) {
 		if (i == -1) {
@@ -330,55 +327,10 @@ public class AppView extends JFrame {
 			txt.setValue(i);
 	}
 
-//	public Vector<SplitConfiguration> getQueue() {
-//		Vector<SplitConfiguration> queue = new Vector<SplitConfiguration>(); 
-//		
-//		for (int i = 0; i<ftm.getRowCount(); i++) {
-//			SplitConfiguration config = getConfig(i);
-//			queue.add(config);
-//		}
-//		
-//		return queue;
-//	}
-//
-//	public void setProcessStatus(UUID id, ProcessStatus ps) {
-//		ftm.setProcessStatus(id, ps);
-//	}
-//
-//	public File getFile(UUID id) {
-//		return ftm.getFile(id);
-//	}
-//
-//	public void setPercentage(UUID id, double percentage) {
-//		ftm.setPercentage(id, percentage);
-//	}
-//
-//	public void setEnabledStartButton(boolean b) {
-//		startButton.setEnabled(b);
-//	}
-//	
-//	public void addSplitOptionsItemListener(ItemListener itemListener) {
-//		actionTypes.addItemListener(itemListener);
-//	}
-	
-	
-	
-	/*
-	 * public ActionType getActionType() { return
-	 * actionTypes.getItemAt(actionTypes.getSelectedIndex()); }
-	 * 
-	 * public long getPartSize() { return Long.parseLong(txtSize.getText()); }
-	 * 
-	 * public int getPartsNumber() { return Integer.parseInt(txtParts.getText()); }
-	 * 
-	 * public char[] getPassword() { return passwordField.getPassword(); }
-	 * 
-	 * public String getOutputDir() { return txtOutputDir.getText(); }
-	 */
-
 	public JPanel getDetailsPanel() {
 		return detailsPanel;
 	}
+	
 	public JComboBox<ActionType> getActionTypes() {
 		return actionTypes;
 	}
