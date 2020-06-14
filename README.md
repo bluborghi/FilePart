@@ -13,13 +13,13 @@ Il controller `AppController` viene istanziato passandogli model e view, definis
 ### Ereditarietà e Polimorfismo
 `FileAction` è l'interfaccia implementata da tutte le classi "azione", ovvero le classi che si occupano di dividere/ricomporre/cifrare un file.
 
-`FileConfiguration` è la classe che descrive lo stato dell'azione: il file, il `ProcessStatus`, e la `SplitConfiguration`.
+`FileConfiguration` è la classe che descrive lo stato dell'azione: il file, il `ProcessStatus`, e la `FileActionConfiguration`.
 
-La `SplitConfiguration` è la classe che contiene la lista di opzioni che servono a identificare la `FileAction` corretta da utilizzare.
+La `FileActionConfiguration` è la classe che contiene la lista di opzioni che servono a identificare la `FileAction` corretta da utilizzare.
 
 In breve: 
 - `FileConfiguration` = Su cosa effettuare la `FileAction`
-- `SplitConfiguration` = Come effettuare la `FileAction`
+- `FileActionConfiguration` = Come effettuare la `FileAction`
 
 Le `FileAction` hanno la seguente gerarchia:
 - `FileMerger`
